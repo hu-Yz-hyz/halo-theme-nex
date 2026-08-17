@@ -1,6 +1,6 @@
 <p align="center">
-  <img src="screenshot.png" alt="EverUs Theme Screenshot" width="400" />
-  <img src="screenshot2.png" alt="EverUs Theme Screenshot" width="400" />
+  <img src="screenshot.png" alt="Nex Theme Screenshot" width="400" />
+  <img src="screenshot2.png" alt="Nex Theme Screenshot" width="400" />
 </p>
 
 # Nex - Halo 2.0 亮/暗色杂志风格主题
