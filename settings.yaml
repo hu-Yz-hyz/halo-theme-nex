@@ -1,0 +1,163 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: halo-theme-nex-setting
+spec:
+  forms:
+    # ────────── 样式 ──────────
+    - group: style
+      label: 样式与字体
+      formSchema:
+        - $formkit: color
+          name: theme_color
+          label: 主题色
+          value: ""
+          help: "选择主题主色，留空则使用默认绿色 (#26a760)"
+        - $formkit: select
+          name: default_theme
+          label: 默认主题
+          value: dark
+          options:
+            - label: 暗色
+              value: dark
+            - label: 亮色
+              value: light
+          help: "访客首次访问时使用的主题，访客可自行在右上角切换并记住选择"
+        - $formkit: text
+          name: custom_font
+          label: 自定义字体URL
+          value: ""
+          help: "输入字体文件的URL地址，留空则使用默认系统字体。支持 woff2、woff、ttf、eot、svg 格式"
+        - $formkit: attachment
+          name: avatar
+          label: 默认头像
+          value: ""
+          help: "建议设置  暗色主题选择建议选亮色图标"  
+
+    # ────────── 首页 ──────────
+    - group: homepage
+      label: 首页
+      formSchema:
+        - $formkit: attachment
+          name: banner_images
+          label: Banner 背景图
+          multiple: true
+          value: []
+          accepts:
+            - "image/*"
+          help: "首页顶部Banner的背景图片，可添加多张自动轮播，留空则使用默认暗色渐变"
+        - $formkit: number
+          name: banner_interval
+          label: 轮播间隔（秒）
+          value: 5
+          help: "多张Banner图片自动轮播的间隔时间，单位为秒"
+        - $formkit: attachment
+          name: logo_l
+          label: logo图片(亮色)
+          value: ""
+          help: "务必设置！ 暗色主题选择建议选亮色图标"  
+        - $formkit: attachment
+          name: logo_d
+          label: logo图片(暗色)
+          value: ""
+          help: "务必设置！ 亮色主题选择建议选暗色图标"  
+
+    # ────────── 页脚 ──────────
+    - group: footer
+      label: 页脚
+      formSchema:
+        - $formkit: switch
+          name: enable_footer
+          label: 启用页脚
+          value: true
+          help: "关闭后整个页脚将不再显示"
+        - $formkit: text
+          name: custom_text
+          label: 自定义页脚文字
+          value: ""
+          help: "留空则不显示版权文字"
+        - $formkit: text
+          name: icp
+          label: ICP 备案号
+          value: ""
+          help: "仅输入备案号，如：京ICP备2024XXXXXX号-1"
+        - $formkit: text
+          name: icp_link
+          label: ICP 备案号链接
+          value: ""
+          help: "留空则链接为空（仅展示文字，不可点击跳转）"
+        - $formkit: text
+          name: gongan
+          label: 公安备案号
+          value: ""
+          help: "仅输入备案号，如：京公网安备 11010102000001号"
+        - $formkit: text
+          name: gongan_link
+          label: 公安备案号链接
+          value: ""
+          help: "留空则链接为空（仅展示文字，不可点击跳转）"
+
+    # ────────── 作者页 ──────────
+    - group: author
+      label: 作者页
+      formSchema:
+        - $formkit: text
+          name: author_kicker
+          label: 标题前缀
+          value: "Author"
+          help: "作者页标题上方的小字，默认 Author，留空则不显示"
+        - $formkit: switch
+          name: show_bio
+          label: 显示简介
+          value: true
+          help: "在作者页顶部与侧边栏显示作者简介"
+        - $formkit: switch
+          name: show_email
+          label: 公开显示邮箱
+          value: false
+          help: "在作者页面侧边栏中显示邮箱信息"
+        - $formkit: switch
+          name: show_phone
+          label: 公开显示手机号
+          value: false
+          help: "在作者页面侧边栏中显示手机号信息"
+
+    # ────────── 认证页面 ──────────
+    - group: auth
+      label: 认证页面
+      formSchema:
+        - $formkit: switch
+          name: auth_show_brand
+          label: 显示站点品牌
+          value: true
+          help: "在登录、注册等页面顶部显示站点 Logo 或名称"
+        - $formkit: attachment
+          name: auth_background
+          label: 背景图
+          value: ""
+          help: "认证页面的背景图片，留空则使用主题背景色"
+        - $formkit: switch
+          name: auth_background_blur
+          label: 背景图模糊
+          value: true
+          help: "开启后对认证页背景图进行模糊处理，可关闭"
+        - $formkit: number
+          name: auth_background_blur_radius
+          label: 模糊强度（像素）
+          value: 6
+          help: "背景图模糊强度，数值越大越模糊，仅开启背景图模糊时生效"
+        - $formkit: switch
+          name: auth_dialog_transparent
+          label: 对话框透明背景
+          value: true
+          help: "开启后登录/注册对话框背景半透明（不影响文字、图片、按钮），关闭后为不透明"
+        - $formkit: number
+          name: auth_dialog_transparent_level
+          label: 对话框背景不透明度（%）
+          value: 82
+          min: 0
+          max: 100
+          help: "数值越高背景越不透明（0 完全透明，100 完全不透明），仅开启对话框透明背景时生效"
+
+
+   

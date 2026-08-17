@@ -1,0 +1,214 @@
+<!doctype html>
+<html
+  lang="zh-CN"
+  xmlns:th="https://www.thymeleaf.org"
+  th:fragment="html (head,content)"
+  th:attr="data-theme=${not #strings.isEmpty(theme.config?.style?.default_theme) ? theme.config.style.default_theme : 'dark'}"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('nex_theme');
+          if (t === 'light' || t === 'dark') {
+            document.documentElement.setAttribute('data-theme', t);
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <meta name="keywords" th:content="${site.seo.keywords}" />
+    <meta name="description" th:content="${not #strings.isEmpty(site.seo.description) ? site.seo.description : site.title}" />
+
+    <!-- Open Graph -->
+    <meta property="og:site_name" th:content="${site.title}" />
+    <meta property="og:title" th:content="${site.title}" />
+    <meta property="og:description" th:content="${not #strings.isEmpty(site.seo.description) ? site.seo.description : site.title}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" th:content="${site.url}" />
+    <th:block th:if="${not #strings.isEmpty(site.favicon)}">
+      <meta property="og:image" th:content="${site.favicon}" />
+    </th:block>
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" th:content="${site.title}" />
+    <meta name="twitter:description" th:content="${not #strings.isEmpty(site.seo.description) ? site.seo.description : site.title}" />
+
+    <th:block th:if="${#strings.isEmpty(site.favicon)}">
+      <link rel="shortcut icon" th:href="@{/assets/images/logo.svg}" />
+      <link rel="bookmark" th:href="@{/assets/images/logo.svg}" />
+      <link rel="apple-touch-icon" sizes="180x180" th:href="@{/assets/images/avatar.jpg}" />
+    </th:block>
+    <th:block th:unless="${#strings.isEmpty(site.favicon)}">
+      <link rel="shortcut icon" th:href="${site.favicon}" />
+      <link rel="bookmark" th:href="${site.favicon}" />
+      <link rel="apple-touch-icon" sizes="180x180" th:href="${site.favicon}" />
+    </th:block>
+
+    <title th:text="${site.title}"></title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" th:href="@{/assets/css/icon.css?v={v}(v=${theme.spec.version})}" />
+    <link rel="stylesheet" th:href="@{/assets/css/style.css?v={v}(v=${theme.spec.version})}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/fancybox/fancybox.css" />
+
+    <!-- Custom theme color -->
+    <th:block th:if="${not #strings.isEmpty(theme.config?.style?.theme_color)}">
+      <style th:inline="text">
+        :root {
+          --color-primary: [[${theme.config.style.theme_color}]];
+        }
+      </style>
+    </th:block>
+
+    <!-- Custom font -->
+    <th:block th:if="${theme.config.style.custom_font}">
+      <style th:inline="text">
+        @font-face {
+          font-family: 'wodeziti';
+          font-weight: 400;
+          font-style: normal;
+          font-display: swap;
+          src: url('[[${theme.config.style.custom_font}]]');
+        }
+        body {
+          font-family: 'wodeziti';
+          font-weight: 400;
+        }
+      </style>
+    </th:block>
+
+    <th:block th:if="${head != null}">
+      <th:block th:replace="${head}" />
+    </th:block>
+  </head>
+
+  <body>
+    <!-- Navigation -->
+    <div th:with="menu = ${menuFinder.getPrimary()}">
+      <div class="site-nav">
+        <div class="site-nav__inner">
+          <nav class="site-nav__menu" role="navigation">
+            <ul class="site-nav__dropdown site-nav__dropdown--cat">
+              <li class="site-nav__dropdown-item"
+                  th:if="${not #strings.isEmpty(theme.config?.homepage?.logo_l) or not #strings.isEmpty(theme.config?.homepage?.logo_d)}">
+                <a th:href="@{/}" class="site-logo">
+                  <img class="site-logo__img site-logo__img--light" th:if="${not #strings.isEmpty(theme.config?.homepage?.logo_l)}" th:src="${theme.config.homepage.logo_l}" alt="Logo" height="48">
+                  <img class="site-logo__img site-logo__img--dark" th:if="${not #strings.isEmpty(theme.config?.homepage?.logo_d)}" th:src="${theme.config.homepage.logo_d}" alt="Logo" height="48">
+                </a>
+              </li>
+
+              <th:block th:if="${menu != null}">
+                <li class="site-nav__dropdown-item" th:each="item : ${menu.menuItems}"
+                    th:classappend="${item.children != null and not item.children.isEmpty()} ? 'has-children' : ''"
+        style="display:flex;align-items:center;">
+                  <a th:href="${#strings.isEmpty(item?.status?.href) ? null : item?.status?.href}"
+                     class="site-nav__dropdown-link"
+                     th:text="${item?.status?.displayName}"
+                     th:aria-haspopup="${item.children != null and not item.children.isEmpty() ? 'true' : 'false'}"
+                     aria-expanded="false" style="padding:0 12px;text-decoration:none;"></a>
+                  <ul class="site-nav__submenu" th:if="${item.children != null and not item.children.isEmpty()}" role="menu">
+                    <li class="site-nav__submenu-item" th:each="child : ${item.children}" role="none">
+                      <a th:href="${#strings.isEmpty(child?.status?.href) ? null : child?.status?.href}"
+                         class="site-nav__submenu-link"
+                         th:text="${child?.status?.displayName}"
+                         role="menuitem"></a>
+                    </li>
+                  </ul>
+                </li>
+              </th:block>
+            </ul>
+            <button class="daohang">
+              <i class="Nug Nug-daohang"></i>
+            </button>
+          </nav>
+
+          <div class="site-nav__actions">
+            <button class="theme__toggle" aria-label="切换主题" title="切换主题">
+              <i class="Nug Nug-caozuo_zidongliangdu"></i>
+            </button>
+            <button class="huojian__toggle hidden">
+              <i class="Nug Nug-huojian"></i>
+            </button>
+            <button class="site-status__toggle" aria-label="用户" title="用户">
+              <th:block th:if="${#strings.isEmpty(#authentication.name) or #authentication.name == 'anonymousUser'}">
+                <th:block th:if="${not #strings.isEmpty(theme.config.style.avatar)}">
+                  <img class="site-status__avatar" th:src="${theme.config.style.avatar}" alt="Avatar" />
+                </th:block>
+                <th:block th:unless="${not #strings.isEmpty(theme.config.style.avatar)}">
+                  <span class="site-status__avatar site-status__avatar--default">
+                    <i class="Nug Nug-zuozhe"></i>
+                  </span>
+                </th:block>
+              </th:block>
+              <th:block th:unless="${#strings.isEmpty(#authentication.name) or #authentication.name == 'anonymousUser'}" th:with="contributor=${contributorFinder.getContributor(#authentication.name)}">
+                <img class="site-status__avatar" th:src="${contributor.avatar}" th:alt="${contributor.displayName}" />
+              </th:block>
+            </button>
+          </div>
+        </div>
+
+        <!-- Site Status Panel -->
+        <div class="site-status-panel" id="site-status-panel"
+             th:with="stats=${siteStatsFinder.getStats()}, tagCount=${tagFinder.list(1,1).total}, pageCount=${singlePageFinder.list(1,1).total}">
+
+           <div class="site-status-panel__header">
+            <span class="site-status-panel__title">欢迎！</span>
+            <span class="site-status-panel__site-name" th:text="${site.title}"></span>
+          </div>
+
+          <div class="site-status-panel__footer">
+            <th:block th:if="${#strings.isEmpty(#authentication.name) or #authentication.name == 'anonymousUser'}">
+              <a class="site-status-panel__login" th:href="@{/console/login(redirect_uri='/console')}" data-no-pjax>
+                登录
+              </a>
+            </th:block>
+            <th:block th:unless="${#strings.isEmpty(#authentication.name) or #authentication.name == 'anonymousUser'}">
+              <a class="site-status-panel__login" th:href="@{/console}" data-no-pjax>
+                管理
+              </a>
+            </th:block>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Main content -->
+    <div class="content" id="pjax-container">
+      <th:block th:replace="${content}" />
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer" th:unless="${theme.config?.footer?.enable_footer == false}">
+      <div class="footer-content">
+        <div class="footer-copyright" th:if="${not #strings.isEmpty(theme.config?.footer?.custom_text)}"
+             th:text="${theme.config.footer.custom_text}"></div>
+        <a th:if="${not #strings.isEmpty(theme.config?.footer?.icp)}"
+           class="footer-beian"
+           th:href="${not #strings.isEmpty(theme.config?.footer?.icp_link) ? theme.config.footer.icp_link : ''}"
+           th:target="${not #strings.isEmpty(theme.config?.footer?.icp_link) ? '_blank' : null}"
+           th:rel="${not #strings.isEmpty(theme.config?.footer?.icp_link) ? 'noopener' : null}"
+           th:text="${theme.config.footer.icp}"></a>
+        <a th:if="${not #strings.isEmpty(theme.config?.footer?.gongan)}"
+           class="footer-beian"
+           th:href="${not #strings.isEmpty(theme.config?.footer?.gongan_link) ? theme.config.footer.gongan_link : ''}"
+           th:target="${not #strings.isEmpty(theme.config?.footer?.gongan_link) ? '_blank' : null}"
+           th:rel="${not #strings.isEmpty(theme.config?.footer?.gongan_link) ? 'noopener' : null}"
+           th:text="${theme.config.footer.gongan}"></a>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/fancybox/fancybox.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+    <script th:src="@{/assets/js/main.js?v={v}(v=${theme.spec.version})}"></script>
+
+    <halo:footer />
+  </body>
+</html>

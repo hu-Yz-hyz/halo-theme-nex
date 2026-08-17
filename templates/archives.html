@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: html(head = null,content = ~{::content})}"
+>
+  <th:block th:fragment="content">
+    <div class="archives">
+      <div class="page-content" style="padding: 3rem 2rem;">
+        <div class="cat-group">
+          <header class="cat-header up">
+            <h2 class="cat-header__title">归档</h2>
+            <div class="cat-header__line"></div>
+            <span class="cat-header__count"></span>
+          </header>
+
+          <div th:if="${archives.items != null and not archives.items.isEmpty()}">
+            <div th:each="archive : ${archives.items}" class="archive-year">
+              <h3 class="archive-year__title" th:text="${archive.year}"></h3>
+              <ul class="archive-month-list">
+                <th:block th:each="month : ${archive.months}">
+                  <li class="archive-post-item" th:each="post : ${month.posts}">
+                    <time class="archive-post-date" th:text="${#temporals.format(post?.spec?.publishTime, 'MM-dd')}"></time>
+                    <a class="hover-link" th:href="@{${post?.status?.permalink}}" th:text="${post?.spec?.title}"></a>
+                  </li>
+                </th:block>
+              </ul>
+            </div>
+          </div>
+          <div th:unless="${archives.items != null and not archives.items.isEmpty()}" class="empty-state">
+            暂无归档。
+          </div>
+        </div>
+      </div>
+
+      <nav class="sticky-pagination" th:if="${archives.hasPrevious() or archives.hasNext()}">
+        <a th:if="${archives.hasPrevious()}" th:href="@{${archives.prevUrl}}" class="sticky-pagination__btn sticky-pagination__btn--prev">
+          <i class="Nug Nug-youbian"></i>
+          <span>上一页</span>
+        </a>
+        <div class="sticky-pagination__dots" th:if="${(archives?.totalPages ?: 0) > 1}">
+          <span th:each="i : ${#numbers.sequence(1, archives?.totalPages ?: 1)}"
+                th:classappend="${i == (archives?.page ?: 1) ? 'sticky-pagination__dot--active' : ''}"
+                class="sticky-pagination__dot"></span>
+        </div>
+        <span class="sticky-pagination__text" th:unless="${(archives?.totalPages ?: 0) > 1}"
+              th:text="|${archives?.page ?: 1} / ${archives?.totalPages ?: 1}|"></span>
+        <a th:if="${archives.hasNext()}" th:href="@{${archives.nextUrl}}" class="sticky-pagination__btn sticky-pagination__btn--next">
+          <span>下一页</span>
+          <i class="Nug Nug-youbian"></i>
+        </a>
+      </nav>
+    </div>
+  </th:block>
+</html>

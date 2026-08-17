@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: html(head = null,content = ~{::content})}"
+>
+  <th:block th:fragment="content">
+    <div class="archive-page archive-page--tags">
+
+      <!-- ====== Hero 头部 ====== -->
+      <header class="archive-hero">
+        <div class="archive-hero__inner">
+          <nav class="archive-hero__breadcrumb">
+            <a th:href="@{/}">首页</a>
+            <span class="archive-hero__breadcrumb-sep">/</span>
+            <span class="archive-hero__breadcrumb-cur">标签</span>
+          </nav>
+
+          <h1 class="archive-hero__title">
+            <span class="archive-hero__kicker">Tags</span>
+            <span>全部标签</span>
+          </h1>
+
+          <div class="archive-hero__meta" th:if="${tags != null and not tags.isEmpty()}">
+            <span class="hero-badge hero-badge--accent">
+              <i class="Nug Nug-biaoqian"></i>
+              <span th:text="${tags.size()}"></span>
+              <span>个标签</span>
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <!-- ====== 标签云 ====== -->
+      <div class="tags-cloud" th:if="${tags != null and not tags.isEmpty()}">
+        <a class="tag-chip" th:each="tag : ${tags}"
+           th:href="@{${tag?.status?.permalink}}"
+           th:style="|--tag-color:${tag?.spec?.color ?: '#26a760'}|">
+          <span class="tag-chip__name" th:text="${tag?.spec?.displayName}"></span>
+          <span class="tag-chip__count" th:text="${tag?.postCount ?: 0}"></span>
+        </a>
+      </div>
+
+      <!-- ====== 空状态 ====== -->
+      <div th:unless="${tags != null and not tags.isEmpty()}" class="archive-empty">
+        <div class="archive-empty__icon">
+          <i class="Nug Nug-biaoqian"></i>
+        </div>
+        <h2>暂无标签</h2>
+        <p>标签创建后会显示在这里。</p>
+      </div>
+    </div>
+  </th:block>
+</html>

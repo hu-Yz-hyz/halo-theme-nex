@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: html(head = null,content = ~{::content})}"
+>
+  <th:block th:fragment="content">
+    <div class="archive-page archive-page--categories">
+
+      <!-- ====== Hero 头部 ====== -->
+      <header class="archive-hero">
+        <div class="archive-hero__inner">
+          <nav class="archive-hero__breadcrumb">
+            <a th:href="@{/}">首页</a>
+            <span class="archive-hero__breadcrumb-sep">/</span>
+            <span class="archive-hero__breadcrumb-cur">分类</span>
+          </nav>
+
+          <h1 class="archive-hero__title">
+            <span class="archive-hero__kicker">Categories</span>
+            <span>全部分类</span>
+          </h1>
+
+          <div class="archive-hero__meta" th:if="${categories != null and not categories.isEmpty()}">
+            <span class="hero-badge hero-badge--accent">
+              <i class="Nug Nug-wenzhang2"></i>
+              <span th:text="${categories.size()}"></span>
+              <span>个分类</span>
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <!-- ====== 分类卡片网格 ====== -->
+      <div class="tags-cloud" th:if="${categories != null and not categories.isEmpty()}">
+        <a class="tag-chip" th:each="category : ${categories}"
+           th:href="@{${category?.status?.permalink}}">
+          <span class="tag-chip__name" th:text="${category?.spec?.displayName}"></span>
+          <span class="tag-chip__count" th:text="${category?.postCount ?: 0}"></span>
+        </a>
+      </div>
+
+      <!-- ====== 空状态 ====== -->
+      <div th:unless="${categories != null and not categories.isEmpty()}" class="archive-empty">
+        <div class="archive-empty__icon">
+          <i class="Nug Nug-wenzhang2"></i>
+        </div>
+        <h2>暂无分类</h2>
+        <p>分类创建后会显示在这里。</p>
+      </div>
+    </div>
+  </th:block>
+</html>

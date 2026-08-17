@@ -1,0 +1,21 @@
+apiVersion: theme.halo.run/v1alpha1
+kind: Theme
+metadata:
+  name: halo-theme-nex
+spec:
+  displayName: Nex
+  author:
+    name: SFP
+    website: "https://sfptech.cn/"
+  logo: "/themes/halo-theme-nex/assets/images/favicon.ico"
+  description: 一款Halo主题。从 JaneLens/EverUs Typecho 主题移植并魔改而来。
+  homepage: "https://github.com/hu-Yz-hyz/halo-theme-nex"
+  repo: "https://github.com/hu-Yz-hyz/halo-theme-nex"
+  issues: "https://github.com/hu-Yz-hyz/halo-theme-nex/issues"
+  settingName: "halo-theme-nex-setting"
+  configMapName: "halo-theme-nex-configMap"
+  version: "1.2.5"
+  requires: ">=2.22.0"
+  license:
+    - name: "GPL-3.0"
+      url: "https://github.com/hu-Yz-hyz/halo-theme-nex/blob/main/LICENSE"

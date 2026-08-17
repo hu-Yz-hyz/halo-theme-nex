@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html th:lang="${#locale.toLanguageTag}"
+      xmlns:th="https://www.thymeleaf.org"
+      th:fragment="layout (title,head,body)"
+      th:attr="data-theme=${not #strings.isEmpty(theme.config?.style?.default_theme) ? theme.config.style.default_theme : 'dark'}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title th:text="${title}"></title>
+
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('nex_theme');
+          if (t === 'light' || t === 'dark') {
+            document.documentElement.setAttribute('data-theme', t);
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <th:block th:if="${#strings.isEmpty(site.favicon)}">
+      <link rel="shortcut icon" th:href="@{/assets/images/favicon.ico}" />
+    </th:block>
+    <th:block th:unless="${#strings.isEmpty(site.favicon)}">
+      <link rel="shortcut icon" th:href="${site.favicon}" />
+    </th:block>
+
+    <link rel="stylesheet" th:href="@{/assets/css/icon.css?v={v}(v=${theme.spec.version})}" />
+    <link rel="stylesheet" th:href="@{/assets/css/style.css?v={v}(v=${theme.spec.version})}" />
+
+    <th:block th:replace="~{gateway_fragments/common::basicStaticResources}"></th:block>
+
+    <style th:inline="text">
+      .gateway-wrapper {
+        --color-primary: [[${not #strings.isEmpty(theme.config?.style?.theme_color) ? theme.config.style.theme_color : '#26a760'}]];
+        --color-secondary: [[${not #strings.isEmpty(theme.config?.style?.theme_color) ? theme.config.style.theme_color : '#26a760'}]];
+        --color-link: [[${not #strings.isEmpty(theme.config?.style?.theme_color) ? theme.config.style.theme_color : '#26a760'}]];
+        --color-text: var(--color-text-secondary);
+        --color-border: var(--color-border-strong);
+      }
+    </style>
+
+    <style>
+      .gateway-page {
+        padding: 0;
+        background-color: var(--color-bg-page);
+        color: var(--color-text-secondary);
+      }
+
+      .gateway-wrapper {
+        color: var(--color-text-secondary);
+        font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+      }
+
+      .nex-auth__brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin: 2.5em 0 0.5em;
+        text-decoration: none;
+      }
+
+      .nex-auth__brand img {
+        height: 48px;
+        width: auto;
+      }
+
+      .nex-auth__title {
+        font-size: 1.4em;
+        color: var(--color-text-primary);
+        font-weight: 600;
+      }
+
+      .gateway-wrapper .halo-logo {
+        display: none;
+      }
+
+      .halo-form-wrapper {
+        background: color-mix(in srgb, var(--color-bg-card) 82%, transparent);
+        border: 1px solid var(--color-border);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .halo-form .form-input {
+        background: var(--color-bg-base);
+        border-color: var(--color-border);
+      }
+
+      .halo-form .form-item input,
+      .halo-form .form-item select {
+        color: var(--color-text-primary);
+      }
+
+      .halo-form .form-item label {
+        color: var(--color-text-secondary);
+      }
+
+      .halo-form .form-input-stack-icon,
+      .halo-form .form-input-stack-text {
+        color: var(--color-text-secondary);
+      }
+
+      .halo-form .form-item-compact label {
+        color: var(--color-text-secondary);
+      }
+
+      .halo-form button[type="submit"] {
+        background: var(--color-primary);
+        color: #fff;
+      }
+
+      .halo-form button[type="submit"]:hover {
+        background: var(--color-primary-hover);
+        opacity: 1;
+      }
+
+      .halo-form input[type="checkbox"] {
+        color: var(--color-primary);
+        background-color: var(--color-bg-base);
+        border-color: var(--color-border);
+      }
+
+      .halo-form .form-input-group button {
+        background: var(--color-bg-base);
+        border-color: var(--color-border);
+        color: var(--color-text-secondary);
+      }
+
+      .halo-form .form-input-group button:hover {
+        color: var(--color-text-primary);
+        background: var(--color-wash);
+      }
+
+      .pill-items li {
+        border-color: var(--color-border);
+      }
+
+      .pill-items li a,
+      .pill-items li button {
+        color: var(--color-text-secondary);
+      }
+
+      .pill-items li:hover {
+        background: var(--color-wash);
+        color: var(--color-text-primary);
+      }
+
+      .divider-wrapper hr {
+        border-top-color: var(--color-border);
+      }
+
+      .alert {
+        border-color: var(--color-border);
+        color: var(--color-text-secondary);
+      }
+    </style>
+
+    <style th:inline="text" th:if="${not #strings.isEmpty(theme.config?.auth?.auth_background)}">
+      .gateway-page {
+        position: relative;
+      }
+
+      .gateway-page::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 0;
+        background-image: url('[[${theme.config.auth.auth_background}]]');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      .gateway-page > * {
+        position: relative;
+        z-index: 1;
+      }
+    </style>
+
+    <th:block th:if="${theme.config?.auth?.auth_background_blur != false and not #strings.isEmpty(theme.config?.auth?.auth_background)}">
+      <style th:inline="text">
+        .gateway-page::before {
+          filter: blur([[${theme.config?.auth?.auth_background_blur_radius ?: 6}]]px);
+          transform: scale(1.05);
+        }
+      </style>
+    </th:block>
+
+    <th:block th:if="${theme.config?.auth?.auth_dialog_transparent != false and theme.config?.auth?.auth_dialog_transparent_level != null}">
+      <style th:inline="text">
+        .halo-form-wrapper {
+          background: color-mix(in srgb, var(--color-bg-card) [[${theme.config.auth.auth_dialog_transparent_level}]]%, transparent);
+        }
+      </style>
+    </th:block>
+
+    <th:block th:if="${theme.config?.auth?.auth_dialog_transparent == false}">
+      <style>
+        .halo-form-wrapper {
+          background: var(--color-bg-card);
+          backdrop-filter: none;
+          -webkit-backdrop-filter: none;
+        }
+      </style>
+    </th:block>
+
+    <th:block th:if="${theme.config?.style?.custom_font}">
+      <style th:inline="text">
+        @font-face {
+          font-family: 'wodeziti';
+          font-weight: 400;
+          font-style: normal;
+          font-display: swap;
+          src: url('[[${theme.config.style.custom_font}]]');
+        }
+        .gateway-wrapper {
+          font-family: 'wodeziti';
+        }
+      </style>
+    </th:block>
+
+    <th:block th:if="${head != null}">
+      <th:block th:replace="${head}" />
+    </th:block>
+
+    <style>
+      .logout-page-wrapper .user-info {
+        border-color: var(--color-border);
+      }
+
+      .logout-page-wrapper .user-name {
+        color: var(--color-text-primary);
+      }
+
+      .logout-page-wrapper .user-details {
+        color: var(--color-text-secondary);
+      }
+    </style>
+  </head>
+  <body class="gateway-page">
+    <a class="nex-auth__brand" th:href="@{/}" th:if="${theme.config?.auth?.auth_show_brand != false}">
+      <img class="site-logo__img site-logo__img--light" th:if="${not #strings.isEmpty(theme.config?.homepage?.logo_l)}" th:src="${theme.config.homepage.logo_l}" alt="Logo" />
+      <img class="site-logo__img site-logo__img--dark" th:if="${not #strings.isEmpty(theme.config?.homepage?.logo_d)}" th:src="${theme.config.homepage.logo_d}" alt="Logo" />
+      <th:block th:if="${#strings.isEmpty(theme.config?.homepage?.logo_l) and #strings.isEmpty(theme.config?.homepage?.logo_d)}">
+        <span class="nex-auth__title" th:text="${site.title}"></span>
+      </th:block>
+    </a>
+    <th:block th:replace="${body}" />
+  </body>
+</html>

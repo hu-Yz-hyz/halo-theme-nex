@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: html(head = null,content = ~{::content})}"
+>
+  <th:block th:fragment="content">
+    <div class="post-content">
+      <div class="page-main">
+        <div class="page-img_content">
+          <!-- 文章头图 -->
+          <header class="post-images" th:unless="${#strings.isEmpty(post?.spec?.cover)}">
+            <div class="gallery-item work-card">
+              <a th:href="${post?.spec?.cover}" data-fancybox="gallery">
+                <img th:src="${post?.spec?.cover}" th:alt="${post?.spec?.title}" />
+              </a>
+              <div class="mil-descr">
+                <a class="zoom">
+                  <button class="Nug Nug-zhankai2 zoom" type="button"></button>
+                </a>
+              </div>
+            </div>
+          </header>
+
+          <div class="page-content">
+            <div class="post">
+              <header class="post__header">
+                <h1 class="post__title" th:text="${post?.spec?.title}"></h1>
+                <div class="post__meta">
+                  <div class="post__meta-group" th:if="${post?.categories != null and not post.categories.isEmpty()}">
+                    <i class="Nug Nug-wenzhang2 post__meta-icon"></i>
+                    <a class="post__category" th:each="category : ${post.categories}" th:href="@{${category?.status?.permalink}}" th:text="${category?.spec?.displayName}"></a>
+                  </div>
+                  <span class="post__meta-sep" th:if="${post?.categories != null and not post.categories.isEmpty() and post?.tags != null and not post.tags.isEmpty()}"></span>
+                  <div class="post__meta-group" th:if="${post?.tags != null and not post.tags.isEmpty()}">
+                    <i class="Nug Nug-biaoqian post__meta-icon"></i>
+                    <a class="post__tag" th:each="tag : ${post.tags}" th:href="@{${tag?.status?.permalink}}" th:text="${tag?.spec?.displayName}"></a>
+                  </div>
+                </div>
+              </header>
+
+              <article class="post__content" th:utext="${post?.content?.content}"></article>
+
+              <div class="post-divider up"></div>
+
+              <div class="post-footer up">
+                <div class="post-author">
+                  <span>作者：</span>
+                  <a class="text-link" th:href="@{${post?.owner?.permalink}}" th:text="${post?.owner?.displayName}"></a>
+                </div>
+                <div class="post-date">
+                  <span>发布时间：</span>
+                  <th:block th:text="${post?.spec?.publishTime != null ? #temporals.format(post.spec.publishTime, 'yyyy-MM-dd') : ''}"></th:block>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="page-comments">
+          <th:block th:replace="~{modules/widgets/comment :: comment(post_name=${post?.metadata?.name},kind='Post',group='content.halo.run')}"></th:block>
+        </div>
+      </div>
+    </div>
+  </th:block>
+</html>

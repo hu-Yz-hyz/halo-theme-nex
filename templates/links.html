@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: html(head = null,content = ~{::content})}"
+>
+  <th:block th:fragment="content">
+    <div class="archive-page archive-page--links">
+
+      <!-- ====== Hero 头部 ====== -->
+      <header class="archive-hero">
+        <div class="archive-hero__inner">
+          <nav class="archive-hero__breadcrumb">
+            <a th:href="@{/}">首页</a>
+            <span class="archive-hero__breadcrumb-sep">/</span>
+            <span class="archive-hero__breadcrumb-cur" th:text="${linksTitle} ?: '链接'"></span>
+          </nav>
+
+          <h1 class="archive-hero__title">
+            <span class="archive-hero__kicker">Links</span>
+            <span th:text="${linksTitle} ?: '友情链接'"></span>
+          </h1>
+
+          <div class="archive-hero__meta" th:if="${not links.isEmpty()}">
+            <span class="hero-badge hero-badge--accent">
+              <i class="Nug Nug-lianjie"></i>
+              <span th:text="${links.size()}"></span>
+              <span>个链接</span>
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <!-- ====== 分组筛选 ====== -->
+      <nav class="link-groups" th:if="${not simpleGroups.isEmpty()}">
+        <a class="link-groups__tab"
+           th:classappend="${group == null ? 'is-active' : ''}"
+           th:href="@{/links}">全部</a>
+        <a class="link-groups__tab"
+           th:each="item : ${simpleGroups}"
+           th:href="@{/links(group=${item.metadata.name})}"
+           th:classappend="${group == item.metadata.name ? 'is-active' : ''}"
+           th:text="${item.spec.displayName}"></a>
+      </nav>
+
+      <!-- ====== 链接卡片网格 ====== -->
+      <div class="links-masonry" th:if="${not links.isEmpty()}">
+        <article class="link-card" th:each="link : ${links}">
+          <a class="link-card__link"
+             th:href="${link.spec.url}"
+             target="_blank"
+             rel="noopener noreferrer nofollow">
+
+            <!-- Logo -->
+            <div class="link-card__avatar">
+              <img th:if="${not #strings.isEmpty(link.spec.logo)}"
+                   th:src="${link.spec.logo}"
+                   th:alt="${link.spec.displayName}"
+                   loading="lazy" />
+              <span th:unless="${not #strings.isEmpty(link.spec.logo)}"
+                    class="link-card__avatar-fallback"
+                    th:text="${#strings.substring(link.spec.displayName ?: '?', 0, 1)}"></span>
+            </div>
+
+            <!-- 信息 -->
+            <div class="link-card__body">
+              <h2 class="link-card__name" th:text="${link.spec.displayName}"></h2>
+              <p class="link-card__desc line-clamp"
+                 th:if="${not #strings.isEmpty(link.spec.description)}"
+                 th:text="${link.spec.description}"
+                 style="--line-clamp: 2;"></p>
+            </div>
+
+            <!-- 外链箭头 -->
+            <span class="link-card__arrow">
+              <i class="Nug Nug-lianjie"></i>
+            </span>
+          </a>
+        </article>
+      </div>
+
+      <!-- ====== 空状态 ====== -->
+      <div th:unless="${not links.isEmpty()}" class="archive-empty">
+        <div class="archive-empty__icon">
+          <i class="Nug Nug-lianjie"></i>
+        </div>
+        <h2>暂无链接</h2>
+        <p>链接添加后会显示在这里。</p>
+      </div>
+
+      <!-- ====== 评论区域 ====== -->
+      <section class="page-content link-comments" th:if="${haloCommentEnabled}">
+        <halo:comment
+          group="plugin.halo.run"
+          kind="Plugin"
+          th:attr="name=${pluginName}"
+        />
+      </section>
+
+    </div>
+  </th:block>
+</html>

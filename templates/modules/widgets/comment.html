@@ -1,0 +1,10 @@
+<aside id="aside-comment" class="aside-comment" th:fragment="comment(post_name,kind,group)">
+  <th:block th:if="${haloCommentEnabled}">
+    <halo:comment th:attr="name=${post_name},kind=${kind},group=${group}"/>
+  </th:block>
+  <th:block th:unless="${haloCommentEnabled}">
+    <div id="comments" class="comment-area">
+      <div class="comment-disbtn">评论已关闭</div>
+    </div>
+  </th:block>
+</aside>

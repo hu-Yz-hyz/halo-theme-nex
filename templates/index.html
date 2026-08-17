@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: html(head = null,content = ~{::content})}"
+>
+  <th:block th:fragment="content">
+    <div class="page-content">
+      <!-- Banner -->
+      <header class="banner banner--love" id="home-banner"
+              th:attr="data-interval=${theme.config?.homepage?.banner_interval ?: 5}">
+        <th:block th:if="${theme.config?.homepage?.banner_images != null and not theme.config.homepage.banner_images.isEmpty()}">
+          <div class="banner-slide" th:each="img, iter : ${theme.config.homepage.banner_images}"
+               th:classappend="${iter.index == 0} ? 'is-active' : ''"
+               th:style="'background-image:url(' + ${img} + ');'"></div>
+        </th:block>
+        <div class="banner-overlay"></div>
+        <button class="banner__nav banner__nav--prev" type="button" aria-label="上一张">‹</button>
+        <button class="banner__nav banner__nav--next" type="button" aria-label="下一张">›</button>
+      </header>
+
+      <!-- 主内容区 -->
+      <div class="cat-group">
+        <ul class="cat-group__list">
+
+          <!-- 最新内容 -->
+          <li class="cat-group__item">
+            <header class="cat-header up">
+              <h2 class="cat-header__title">最新内容</h2>
+              <div class="cat-header__line"></div>
+            </header>
+
+            <ul class="cat-posts">
+              <th:block th:if="${posts?.items != null and not posts.items.isEmpty()}">
+                <li class="cat-posts__item up" th:each="post,iterStat : ${posts.items}">
+                  <h3 class="line-clamp">
+                    <span class="accent"></span>
+                    <a class="link hover-link" th:href="@{${post?.status?.permalink}}" th:text="${post?.spec?.title}"></a>
+                  </h3>
+                  <p class="line-clamp" th:if="${post?.status?.excerpt}" th:text="${post?.status?.excerpt}"></p>
+                  <a class="link hover-link" th:href="@{${post?.status?.permalink}}">展开内容</a>
+                </li>
+                <li class="cat-posts__more">
+                  <a th:href="@{/archives}" class="more-link">
+                    <span>全部内容</span>
+                    <span class="more-link__count"><em th:text="${posts?.total ?: 0}"></em> 篇</span>
+                    <i class="Nug Nug-youbian"></i>
+                  </a>
+                </li>
+              </th:block>
+            </ul>
+          </li>
+
+          
+          
+          <li class="cat-group__item">
+            <header>
+              <div class="cat-header__line"></div>
+              <p class="cat__quote"><span th:text="${site.subtitle}"> </span><a th:href="@{/}" class="text-link" th:text="${site.title}"></a> . All Rights Reserved. Powered by<a href="https://halo.run" class="hover:underline" target="_blank">Halo</a>.</p>
+            </header>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </th:block>
+</html>

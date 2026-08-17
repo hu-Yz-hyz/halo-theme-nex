@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: html(head = null,content = ~{::content})}"
+>
+  <th:block th:fragment="content">
+    <div class="archive-page archive-page--tag" th:style="|--tag-color:${tag?.spec?.color ?: '#26a760'}|">
+
+      <!-- ====== Hero 头部 ====== -->
+      <header class="archive-hero archive-hero--tinted" th:if="${tag?.spec?.displayName}">
+        <div class="archive-hero__inner">
+          <nav class="archive-hero__breadcrumb">
+            <a th:href="@{/}">首页</a>
+            <span class="archive-hero__breadcrumb-sep">/</span>
+            <a th:href="@{/tags}">标签</a>
+            <span class="archive-hero__breadcrumb-sep">/</span>
+            <span class="archive-hero__breadcrumb-cur" th:text="${tag?.spec?.displayName}"></span>
+          </nav>
+
+          <h1 class="archive-hero__title">
+            <span class="archive-hero__kicker">Tag</span>
+            <span th:text="${tag?.spec?.displayName}"></span>
+          </h1>
+
+          <div class="archive-hero__meta">
+            <span class="hero-badge hero-badge--accent">
+              <i class="Nug Nug-biaoqian"></i>
+              <span th:text="${tag?.spec?.displayName}"></span>
+            </span>
+            <span class="hero-badge hero-badge--muted">
+              <i class="Nug Nug-wenzhang"></i>
+              <span th:text="${posts?.total ?: 0}"></span>
+              <span>篇文章</span>
+            </span>
+            <span class="hero-badge hero-badge--muted" th:if="${(posts?.totalPages ?: 0) > 1}">
+              <i class="Nug Nug-riqi"></i>
+              <span th:text="|第 ${posts?.page ?: 1} / ${posts?.totalPages ?: 1} 页|"></span>
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <!-- ====== 回退 Header（无显示名时） ====== -->
+      <header class="archive-hero archive-hero--minimal" th:unless="${tag?.spec?.displayName}">
+        <div class="archive-hero__inner">
+          <h1 class="archive-hero__title">
+            <span class="archive-hero__kicker">Tag</span>
+            <span>标签</span>
+          </h1>
+        </div>
+      </header>
+
+      <!-- ====== 主体：文章网格 + 侧边栏 ====== -->
+      <div class="archive-body archive-body--sidebar">
+
+        <!-- 文章卡片网格 -->
+        <div class="archive-body__main">
+          <div class="post-masonry" th:if="${posts?.items != null and not posts.items.isEmpty()}">
+            <article class="post-card" th:each="post,iterStat : ${posts.items}">
+              <a th:href="@{${post.status?.permalink}}" class="post-card__link">
+
+                <!-- 封面 -->
+                <figure class="post-card__cover">
+                  <img th:if="${not #strings.isEmpty(post.spec?.cover)}"
+                       th:src="${post.spec.cover}"
+                       th:alt="${post.spec?.title}" loading="lazy" />
+                  <img th:unless="${not #strings.isEmpty(post.spec?.cover)}"
+                       th:src="@{/assets/images/bg.jpg}"
+                       th:alt="${post.spec?.title}" loading="lazy" />
+                  <span class="post-card__index" th:text="${'0' + (iterStat.index + 1)}"></span>
+                </figure>
+
+                <!-- 信息 -->
+                <div class="post-card__body">
+                  <h2 class="post-card__title line-clamp" th:text="${post.spec?.title}"></h2>
+
+                  <div class="post-card__meta">
+                    <time th:if="${post.spec?.publishTime}"
+                          th:text="${#temporals.format(post.spec?.publishTime, 'yyyy-MM-dd')}"></time>
+                    <span th:if="${(post.status?.commentsCount ?: 0) > 0}"
+                          th:text="${post.status?.commentsCount} + ' 评论'"></span>
+                  </div>
+
+                  <p class="post-card__excerpt line-clamp"
+                     th:if="${not #strings.isEmpty(post.status?.excerpt)}"
+                     th:text="${post.status?.excerpt}"></p>
+                </div>
+              </a>
+            </article>
+          </div>
+
+          <!-- 空状态 -->
+          <div th:unless="${posts?.items != null and not posts.items.isEmpty()}" class="archive-empty">
+            <div class="archive-empty__icon">
+              <i class="Nug Nug-biaoqian"></i>
+            </div>
+            <h2>暂无文章</h2>
+            <p>暂无使用此标签的文章。</p>
+          </div>
+        </div>
+
+        <!-- ====== 侧边栏 ====== -->
+        <aside class="archive-sidebar" th:if="${tag?.spec?.displayName}">
+          <div class="archive-sidebar__card">
+            <div class="archive-sidebar__stat">
+              <span class="archive-sidebar__stat-num" th:text="${posts?.total ?: 0}"></span>
+              <span class="archive-sidebar__stat-label">篇文章</span>
+            </div>
+            <div class="archive-sidebar__stat" th:if="${(posts?.totalPages ?: 0) > 1}">
+              <span class="archive-sidebar__stat-num" th:text="${posts?.totalPages ?: 1}"></span>
+              <span class="archive-sidebar__stat-label">页</span>
+            </div>
+          </div>
+
+          <nav class="archive-sidebar__card">
+            <h3 class="archive-sidebar__heading">快捷链接</h3>
+            <a th:href="@{/tags}" class="archive-sidebar__link">
+              <i class="Nug Nug-biaoqian"></i> 所有标签
+            </a>
+            <a th:href="@{/categories}" class="archive-sidebar__link">
+              <i class="Nug Nug-biaoqian"></i> 分类
+            </a>
+            <a th:href="@{/archives}" class="archive-sidebar__link">
+              <i class="Nug Nug-riqi"></i> 归档
+            </a>
+          </nav>
+        </aside>
+      </div>
+
+      <!-- ====== 分页 ====== -->
+      <nav class="sticky-pagination" th:if="${posts?.hasPrevious() or posts?.hasNext()}">
+        <a th:if="${posts?.hasPrevious()}" th:href="@{${posts?.prevUrl}}" class="sticky-pagination__btn sticky-pagination__btn--prev">
+          <i class="Nug Nug-youbian"></i>
+          <span>上一页</span>
+        </a>
+        <div class="sticky-pagination__dots" th:if="${(posts?.totalPages ?: 0) > 1}">
+          <span th:each="i : ${#numbers.sequence(1, posts?.totalPages ?: 1)}"
+                th:classappend="${i == (posts?.page ?: 1) ? 'sticky-pagination__dot--active' : ''}"
+                class="sticky-pagination__dot"></span>
+        </div>
+        <span class="sticky-pagination__text" th:unless="${(posts?.totalPages ?: 0) > 1}"
+              th:text="|${posts?.page ?: 1} / ${posts?.totalPages ?: 1}|"></span>
+        <a th:if="${posts?.hasNext()}" th:href="@{${posts?.nextUrl}}" class="sticky-pagination__btn sticky-pagination__btn--next">
+          <span>下一页</span>
+          <i class="Nug Nug-youbian"></i>
+        </a>
+      </nav>
+    </div>
+  </th:block>
+</html>
