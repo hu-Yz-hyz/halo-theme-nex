@@ -7,14 +7,14 @@
     <div class="archives">
       <div class="page-content" style="padding: 3rem 2rem;">
         <div class="cat-group">
-          <header class="cat-header up">
+          <header class="cat-header up" data-nex-anim="archive_list">
             <h2 class="cat-header__title">归档</h2>
             <div class="cat-header__line"></div>
             <span class="cat-header__count"></span>
           </header>
 
           <div th:if="${archives.items != null and not archives.items.isEmpty()}">
-            <div th:each="archive : ${archives.items}" class="archive-year">
+            <div th:each="archive : ${archives.items}" class="archive-year" data-nex-anim="archive_list">
               <h3 class="archive-year__title" th:text="${archive.year}"></h3>
               <ul class="archive-month-list">
                 <th:block th:each="month : ${archive.months}">

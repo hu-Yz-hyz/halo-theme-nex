@@ -7,7 +7,7 @@
     <div class="archive-page archive-page--links">
 
       <!-- ====== Hero 头部 ====== -->
-      <header class="archive-hero">
+      <header class="archive-hero" data-nex-anim="page_hero">
         <div class="archive-hero__inner">
           <nav class="archive-hero__breadcrumb">
             <a th:href="@{/}">首页</a>
@@ -44,7 +44,7 @@
 
       <!-- ====== 链接卡片网格 ====== -->
       <div class="links-masonry" th:if="${not links.isEmpty()}">
-        <article class="link-card" th:each="link : ${links}">
+        <article class="link-card" data-nex-anim="link_card" th:each="link : ${links}">
           <a class="link-card__link"
              th:href="${link.spec.url}"
              target="_blank"
@@ -88,7 +88,7 @@
       </div>
 
       <!-- ====== 评论区域 ====== -->
-      <section class="page-content link-comments" th:if="${haloCommentEnabled}">
+      <section class="page-content link-comments" data-nex-anim="comments" th:if="${haloCommentEnabled}">
         <halo:comment
           group="plugin.halo.run"
           kind="Plugin"

@@ -7,7 +7,7 @@
     <div class="archive-page archive-page--categories">
 
       <!-- ====== Hero 头部 ====== -->
-      <header class="archive-hero">
+      <header class="archive-hero" data-nex-anim="page_hero">
         <div class="archive-hero__inner">
           <nav class="archive-hero__breadcrumb">
             <a th:href="@{/}">首页</a>
@@ -32,7 +32,7 @@
 
       <!-- ====== 分类卡片网格 ====== -->
       <div class="tags-cloud" th:if="${categories != null and not categories.isEmpty()}">
-        <a class="tag-chip" th:each="category : ${categories}"
+        <a class="tag-chip" data-nex-anim="tag_chip" th:each="category : ${categories}"
            th:href="@{${category?.status?.permalink}}">
           <span class="tag-chip__name" th:text="${category?.spec?.displayName}"></span>
           <span class="tag-chip__count" th:text="${category?.postCount ?: 0}"></span>

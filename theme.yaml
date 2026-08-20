@@ -8,13 +8,13 @@ spec:
     name: SFP
     website: "https://sfptech.cn/"
   logo: "/themes/halo-theme-nex/assets/images/favicon.ico"
-  description: 一款Halo主题。从 JaneLens/EverUs Typecho 主题移植并魔改而来。
+  description: 一款Halo主题。从EverUs魔改而来，通用性较强，效果见sfptech.cn。相较于EverUs，简化了部分功能，增加了大量适合作为宣传和用户体验的部件。拥有更多且效果更好的自定义项，可广泛用于个人论坛和工作室或企业官网。
   homepage: "https://github.com/hu-Yz-hyz/halo-theme-nex"
   repo: "https://github.com/hu-Yz-hyz/halo-theme-nex"
   issues: "https://github.com/hu-Yz-hyz/halo-theme-nex/issues"
   settingName: "halo-theme-nex-setting"
   configMapName: "halo-theme-nex-configMap"
-  version: "1.2.5"
+  version: "1.3.3-Beta"
   requires: ">=2.22.0"
   license:
     - name: "GPL-3.0"

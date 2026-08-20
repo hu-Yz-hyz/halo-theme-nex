@@ -6,12 +6,28 @@
   <th:block th:fragment="content">
     <div class="page-content">
       <!-- Banner -->
-      <header class="banner banner--love" id="home-banner"
+      <header class="banner banner--love" id="home-banner" data-nex-anim="banner"
               th:attr="data-interval=${theme.config?.homepage?.banner_interval ?: 5}">
-        <th:block th:if="${theme.config?.homepage?.banner_images != null and not theme.config.homepage.banner_images.isEmpty()}">
-          <div class="banner-slide" th:each="img, iter : ${theme.config.homepage.banner_images}"
+        <th:block th:if="${theme.config?.homepage?.banner_items != null and not theme.config.homepage.banner_items.isEmpty()}">
+          <div class="banner-slide" th:each="item, iter : ${theme.config.homepage.banner_items.?[!#strings.isEmpty(#this['image'])]}"
                th:classappend="${iter.index == 0} ? 'is-active' : ''"
-               th:style="'background-image:url(' + ${img} + ');'"></div>
+               th:style="'background-image:url(' + ${item.image} + ');'">
+            <a class="banner-slide__link" th:if="${not #strings.isEmpty(item.link)}"
+               th:href="${item.link}"></a>
+            <span class="banner-slide__text"
+                  th:if="${not #strings.isEmpty(item.text)}"
+                  th:attr="data-font=${item.text_font}"
+                  th:classappend="' banner-slide__text--' + ${not #strings.isEmpty(item.text_position) ? item.text_position : 'center'}"
+                  th:style="'color:' + ${not #strings.isEmpty(item.text_color) ? item.text_color : '#ffffff'} + ';font-size:' + ${item.text_size != null ? item.text_size : 40} + 'px;'"
+                  th:text="${item.text}"></span>
+          </div>
+        </th:block>
+        <th:block th:unless="${theme.config?.homepage?.banner_items != null and not theme.config.homepage.banner_items.isEmpty()}">
+          <th:block th:if="${theme.config?.homepage?.banner_images != null and not theme.config.homepage.banner_images.isEmpty()}">
+            <div class="banner-slide" th:each="img, iter : ${theme.config.homepage.banner_images}"
+                 th:classappend="${iter.index == 0} ? 'is-active' : ''"
+                 th:style="'background-image:url(' + ${img} + ');'"></div>
+          </th:block>
         </th:block>
         <div class="banner-overlay"></div>
         <button class="banner__nav banner__nav--prev" type="button" aria-label="上一张">‹</button>
@@ -24,14 +40,14 @@
 
           <!-- 最新内容 -->
           <li class="cat-group__item">
-            <header class="cat-header up">
+            <header class="cat-header up" data-nex-anim="post_list">
               <h2 class="cat-header__title">最新内容</h2>
               <div class="cat-header__line"></div>
             </header>
 
             <ul class="cat-posts">
               <th:block th:if="${posts?.items != null and not posts.items.isEmpty()}">
-                <li class="cat-posts__item up" th:each="post,iterStat : ${posts.items}">
+                <li class="cat-posts__item up" data-nex-anim="post_list" th:each="post,iterStat : ${posts.items}">
                   <h3 class="line-clamp">
                     <span class="accent"></span>
                     <a class="link hover-link" th:href="@{${post?.status?.permalink}}" th:text="${post?.spec?.title}"></a>

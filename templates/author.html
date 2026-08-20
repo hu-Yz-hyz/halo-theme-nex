@@ -7,7 +7,7 @@
     <div class="archive-page archive-page--author">
 
       <!-- ====== Hero 头部 ====== -->
-      <header class="archive-hero" th:if="${author?.spec?.displayName}">
+      <header class="archive-hero" data-nex-anim="page_hero" th:if="${author?.spec?.displayName}">
         <div class="archive-hero__inner">
           <nav class="archive-hero__breadcrumb">
             <a th:href="@{/}">首页</a>
@@ -39,7 +39,7 @@
       </header>
 
       <!-- ====== 回退 Header ====== -->
-      <header class="archive-hero archive-hero--minimal" th:unless="${author?.spec?.displayName}">
+      <header class="archive-hero archive-hero--minimal" data-nex-anim="page_hero" th:unless="${author?.spec?.displayName}">
         <div class="archive-hero__inner">
           <h1 class="archive-hero__title">
             <span class="archive-hero__kicker" th:text="${theme.config?.author?.author_kicker ?: 'Author'}"></span>
@@ -54,7 +54,7 @@
         <!-- 文章卡片网格 -->
         <div class="archive-body__main">
           <div class="post-masonry" th:if="${posts?.items != null and not posts.items.isEmpty()}">
-            <article class="post-card" th:each="post,iterStat : ${posts.items}">
+            <article class="post-card" data-nex-anim="post_card" th:each="post,iterStat : ${posts.items}">
               <a th:href="@{${post?.status?.permalink}}" class="post-card__link">
 
                 <!-- 封面 -->
@@ -63,7 +63,7 @@
                        th:src="${post.spec.cover}"
                        th:alt="${post?.spec?.title}" loading="lazy" />
                   <img th:unless="${not #strings.isEmpty(post?.spec?.cover)}"
-                       th:src="@{/assets/images/bg.jpg}"
+                       th:src="${not #strings.isEmpty(theme.config?.post?.default_cover) ? theme.config.post.default_cover : @{/assets/images/bg.jpg}}"
                        th:alt="${post?.spec?.title}" loading="lazy" />
                   <span class="post-card__index" th:text="${'0' + (iterStat.index + 1)}"></span>
                 </figure>
@@ -100,7 +100,7 @@
         <!-- ====== 侧边栏 ====== -->
         <aside class="archive-sidebar" th:if="${author?.spec?.displayName}">
           <!-- 作者信息卡 -->
-          <div class="archive-sidebar__card archive-sidebar__card--author">
+          <div class="archive-sidebar__card archive-sidebar__card--author" data-nex-anim="sidebar">
             <div class="archive-sidebar__avatar-wrap">
               <img class="archive-sidebar__avatar"
                    th:src="${#strings.isEmpty(author?.spec?.avatar) ? #theme.assets('/images/avatar.png') : author.spec.avatar}"
@@ -125,7 +125,7 @@
           </div>
 
           <!-- 统计卡 -->
-          <div class="archive-sidebar__card">
+          <div class="archive-sidebar__card" data-nex-anim="sidebar">
             <div class="archive-sidebar__stat">
               <span class="archive-sidebar__stat-num" th:text="${posts?.total ?: 0}"></span>
               <span class="archive-sidebar__stat-label">篇文章</span>
@@ -137,7 +137,7 @@
           </div>
 
           <!-- 快捷链接 -->
-          <nav class="archive-sidebar__card">
+          <nav class="archive-sidebar__card" data-nex-anim="sidebar">
             <h3 class="archive-sidebar__heading">快捷链接</h3>
             <a th:href="@{/categories}" class="archive-sidebar__link">
               <i class="Nug Nug-wenzhang2"></i> 所有分类

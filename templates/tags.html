@@ -7,7 +7,7 @@
     <div class="archive-page archive-page--tags">
 
       <!-- ====== Hero 头部 ====== -->
-      <header class="archive-hero">
+      <header class="archive-hero" data-nex-anim="page_hero">
         <div class="archive-hero__inner">
           <nav class="archive-hero__breadcrumb">
             <a th:href="@{/}">首页</a>
@@ -32,7 +32,7 @@
 
       <!-- ====== 标签云 ====== -->
       <div class="tags-cloud" th:if="${tags != null and not tags.isEmpty()}">
-        <a class="tag-chip" th:each="tag : ${tags}"
+        <a class="tag-chip" data-nex-anim="tag_chip" th:each="tag : ${tags}"
            th:href="@{${tag?.status?.permalink}}"
            th:style="|--tag-color:${tag?.spec?.color ?: '#26a760'}|">
           <span class="tag-chip__name" th:text="${tag?.spec?.displayName}"></span>

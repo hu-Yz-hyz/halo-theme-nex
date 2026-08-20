@@ -9,15 +9,15 @@
           <div class="page-img_content">
             <div class="page-content">
               <div class="post">
-                <header class="post__header">
+                <header class="post__header" data-nex-anim="post_content">
                   <h1 class="post__title" th:text="${singlePage.spec.title}"></h1>
                 </header>
 
-                <article class="post__content" th:utext="${singlePage.content.content}"></article>
+                <article class="post__content" data-nex-anim="post_content" th:utext="${singlePage.content.content}"></article>
 
-                <div class="post-divider up"></div>
+                <div class="post-divider up" data-nex-anim="post_content"></div>
 
-                <div class="post-footer up">
+                <div class="post-footer up" data-nex-anim="post_content">
                   <div class="post-date">
                     <span>发布时间：</span>
                     <th:block th:text="${#temporals.format(singlePage.spec.publishTime, 'yyyy-MM-dd')}"></th:block>
@@ -28,7 +28,7 @@
           </div>
 
           <!-- Comments -->
-          <div class="page-comments">
+          <div class="page-comments" data-nex-anim="comments">
             <th:block th:replace="~{modules/widgets/comment :: comment(post_name=${singlePage.metadata.name},kind='SinglePage',group='content.halo.run')}"></th:block>
           </div>
         </div>

@@ -4,6 +4,16 @@
   xmlns:th="https://www.thymeleaf.org"
   th:fragment="html (head,content)"
   th:attr="data-theme=${not #strings.isEmpty(theme.config?.style?.default_theme) ? theme.config.style.default_theme : 'dark'}"
+  th:with="animOn=${theme.config?.anim?.enabled == true},
+           hoverLift=${theme.config?.anim?.enabled == true and theme.config?.anim?.hover_lift != false},
+           hoverGlow=${theme.config?.anim?.enabled == true and theme.config?.anim?.hover_glow != false},
+           hoverZoom=${theme.config?.anim?.enabled == true and theme.config?.anim?.hover_zoom != false},
+           ambCursor=${theme.config?.anim?.enabled == true and theme.config?.anim?.ambient_cursor == true},
+           ambParticles=${theme.config?.anim?.enabled == true and theme.config?.anim?.ambient_particles == true},
+           ambGradient=${theme.config?.anim?.enabled == true and theme.config?.anim?.ambient_gradient == true},
+           ambParallax=${theme.config?.anim?.enabled == true and theme.config?.anim?.ambient_parallax == true},
+           transSlide=${theme.config?.anim?.enabled == true and theme.config?.anim?.transition_effect == 'slide'}"
+  th:classappend="${(animOn ? 'nex-anim' : '') + (hoverLift ? ' nex-hover-lift' : '') + (hoverGlow ? ' nex-hover-glow' : '') + (hoverZoom ? ' nex-hover-zoom' : '') + (ambCursor ? ' nex-ambient-cursor' : '') + (ambParticles ? ' nex-ambient-particles' : '') + (ambGradient ? ' nex-ambient-gradient' : '') + (ambParallax ? ' nex-ambient-parallax' : '') + (transSlide ? ' nex-transition-slide' : '')}"
 >
   <head>
     <meta charset="UTF-8" />
@@ -36,11 +46,6 @@
     <meta name="twitter:title" th:content="${site.title}" />
     <meta name="twitter:description" th:content="${not #strings.isEmpty(site.seo.description) ? site.seo.description : site.title}" />
 
-    <th:block th:if="${#strings.isEmpty(site.favicon)}">
-      <link rel="shortcut icon" th:href="@{/assets/images/logo.svg}" />
-      <link rel="bookmark" th:href="@{/assets/images/logo.svg}" />
-      <link rel="apple-touch-icon" sizes="180x180" th:href="@{/assets/images/avatar.jpg}" />
-    </th:block>
     <th:block th:unless="${#strings.isEmpty(site.favicon)}">
       <link rel="shortcut icon" th:href="${site.favicon}" />
       <link rel="bookmark" th:href="${site.favicon}" />
@@ -80,6 +85,14 @@
       </style>
     </th:block>
 
+    <!-- Animation config -->
+    <script th:inline="javascript">
+      window.NEX_ANIM = {
+        global: /*[[${theme.config?.anim}]]*/ {},
+        blocks: /*[[${theme.config?.anim_blocks}]]*/ {}
+      };
+    </script>
+
     <th:block th:if="${head != null}">
       <th:block th:replace="${head}" />
     </th:block>
@@ -88,7 +101,7 @@
   <body>
     <!-- Navigation -->
     <div th:with="menu = ${menuFinder.getPrimary()}">
-      <div class="site-nav">
+      <div class="site-nav" data-nex-anim="nav">
         <div class="site-nav__inner">
           <nav class="site-nav__menu" role="navigation">
             <ul class="site-nav__dropdown site-nav__dropdown--cat">
@@ -182,7 +195,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="site-footer" th:unless="${theme.config?.footer?.enable_footer == false}">
+    <footer class="site-footer" data-nex-anim="footer" th:unless="${theme.config?.footer?.enable_footer == false}">
       <div class="footer-content">
         <div class="footer-copyright" th:if="${not #strings.isEmpty(theme.config?.footer?.custom_text)}"
              th:text="${theme.config.footer.custom_text}"></div>

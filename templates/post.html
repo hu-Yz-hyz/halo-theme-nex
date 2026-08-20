@@ -8,10 +8,10 @@
       <div class="page-main">
         <div class="page-img_content">
           <!-- 文章头图 -->
-          <header class="post-images" th:unless="${#strings.isEmpty(post?.spec?.cover)}">
+          <header class="post-images" data-nex-anim="post_content" th:unless="${#strings.isEmpty(post?.spec?.cover) and #strings.isEmpty(theme.config?.post?.default_cover)}">
             <div class="gallery-item work-card">
-              <a th:href="${post?.spec?.cover}" data-fancybox="gallery">
-                <img th:src="${post?.spec?.cover}" th:alt="${post?.spec?.title}" />
+              <a th:href="${not #strings.isEmpty(post?.spec?.cover) ? post?.spec?.cover : theme.config?.post?.default_cover}" data-fancybox="gallery">
+                <img th:src="${not #strings.isEmpty(post?.spec?.cover) ? post?.spec?.cover : theme.config?.post?.default_cover}" th:alt="${post?.spec?.title}" />
               </a>
               <div class="mil-descr">
                 <a class="zoom">
@@ -23,7 +23,7 @@
 
           <div class="page-content">
             <div class="post">
-              <header class="post__header">
+              <header class="post__header" data-nex-anim="post_content">
                 <h1 class="post__title" th:text="${post?.spec?.title}"></h1>
                 <div class="post__meta">
                   <div class="post__meta-group" th:if="${post?.categories != null and not post.categories.isEmpty()}">
@@ -38,11 +38,11 @@
                 </div>
               </header>
 
-              <article class="post__content" th:utext="${post?.content?.content}"></article>
+              <article class="post__content" data-nex-anim="post_content" th:utext="${post?.content?.content}"></article>
 
-              <div class="post-divider up"></div>
+              <div class="post-divider up" data-nex-anim="post_content"></div>
 
-              <div class="post-footer up">
+              <div class="post-footer up" data-nex-anim="post_content">
                 <div class="post-author">
                   <span>作者：</span>
                   <a class="text-link" th:href="@{${post?.owner?.permalink}}" th:text="${post?.owner?.displayName}"></a>
@@ -56,7 +56,7 @@
           </div>
         </div>
 
-        <div class="page-comments">
+        <div class="page-comments" data-nex-anim="comments">
           <th:block th:replace="~{modules/widgets/comment :: comment(post_name=${post?.metadata?.name},kind='Post',group='content.halo.run')}"></th:block>
         </div>
       </div>

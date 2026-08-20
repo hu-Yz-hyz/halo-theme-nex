@@ -680,6 +680,7 @@ a {
   height: 100%;
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAKUlEQVQImU3IMREAIAgAwJfNkQCEsH8cijjpMf6vnXlQaIiJFx+omEBfmqIEZLe2jzcAAAAASUVORK5CYII=);
   z-index: 1;
+  pointer-events: none;
 }
 
 .banner--love::after {
@@ -691,6 +692,7 @@ a {
   left: 0;
   background: linear-gradient(to top, var(--color-bg-base), transparent);
   z-index: 3;
+  pointer-events: none;
 }
 
 .banner-slide {
@@ -704,11 +706,47 @@ a {
   opacity: 0;
   transition: opacity 1s ease;
   z-index: 0;
+  pointer-events: none;
 }
 
 .banner-slide.is-active {
   opacity: 1;
+  pointer-events: auto;
 }
+
+.banner-slide__link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.banner-slide__text {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  max-width: 70%;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45), 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+.banner-slide__text--default {
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+}
+
+.banner-slide__text--top-left { top: 28px; left: 32px; }
+.banner-slide__text--top-center { top: 28px; left: 50%; transform: translateX(-50%); text-align: center; }
+.banner-slide__text--top-right { top: 28px; right: 32px; text-align: right; }
+.banner-slide__text--middle-left { top: 50%; left: 96px; transform: translateY(-50%); }
+.banner-slide__text--middle-right { top: 50%; right: 96px; transform: translateY(-50%); text-align: right; }
+.banner-slide__text--center { top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+.banner-slide__text--bottom-left { bottom: 36px; left: 32px; }
+.banner-slide__text--bottom-center { bottom: 36px; left: 50%; transform: translateX(-50%); text-align: center; }
+.banner-slide__text--bottom-right { bottom: 36px; right: 32px; text-align: right; }
 
 .banner-overlay {
   position: absolute;
@@ -718,6 +756,7 @@ a {
   height: 100%;
   background: linear-gradient(0deg, var(--color-bg-base) 0%, color-mix(in srgb, var(--color-bg-base) 30%, transparent) 36%, transparent 100%);
   z-index: 2;
+  pointer-events: none;
 }
 
 .banner__nav {
@@ -1181,7 +1220,7 @@ a {
   background-color: var(--color-text-primary);
 }
 
-/* ========== Archive Pages（分类 / 标签 / 瞬间 / 链接） ========== */
+/* ========== Archive Pages（分类 / 标签 / 链接） ========== */
 
 /* --- Shared Hero (Minimal) --- */
 .archive-hero {
@@ -1898,291 +1937,6 @@ a {
   border: none !important;
   padding: 2rem;
   border-radius: 1rem;
-}
-
-/* ========== 首页：最新动态 ========== */
-.home-moments {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  margin-bottom: 0;
-}
-
-.home-moment__inner {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  padding: 1.2rem 0;
-  border-bottom: solid 0.05rem var(--color-border);
-}
-
-.home-moment:first-child .home-moment__inner {
-  padding-top: 0;
-}
-
-.home-moment__user {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.home-moment__avatar {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.home-moment__name {
-  font-size: 0.75em;
-  font-weight: 500;
-  color: var(--color-text-tertiary);
-}
-
-.home-moment__name::after {
-  content: '·';
-  margin: 0 0.4rem;
-  color: var(--color-text-dim);
-}
-
-.home-moment__time {
-  font-size: 0.65em;
-  color: var(--color-text-dim);
-}
-
-.home-moment__text {
-  font-size: 0.78em;
-  color: var(--color-text-secondary);
-  line-height: 1.7;
-  padding-left: 2rem;
-}
-
-.home-moment__text p {
-  margin-bottom: 0.3rem;
-}
-
-.home-moment__text a {
-  color: var(--color-primary);
-}
-
-.home-moment__photos {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  padding-left: 2rem;
-}
-
-.home-moment__photo {
-  width: calc(33.333% - 0.34rem);
-  max-width: 120px;
-  aspect-ratio: 1;
-  object-fit: cover;
-  border-radius: 0.25rem;
-  transition: opacity 0.3s;
-}
-
-.home-moment__photo:hover {
-  opacity: 0.75;
-}
-
-.home-moment__actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding-left: 2rem;
-}
-
-/* --- Shared Moment Action Styles --- */
-.home-moment__action,
-.moment-card__action {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.72em;
-  color: var(--color-text-dim);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.15rem 0.3rem;
-  border-radius: 0.25rem;
-  transition: color 0.2s, background-color 0.2s;
-}
-
-.home-moment__action:hover,
-.moment-card__action:hover {
-  color: var(--color-primary);
-  background-color: var(--color-primary-alpha-sm);
-}
-
-.home-moment__action.is-liked,
-.moment-card__action.is-liked {
-  color: #e53e3e;
-}
-
-.home-moment__action.is-liked:hover,
-.moment-card__action.is-liked:hover {
-  color: #c53030;
-  background-color: rgba(229, 62, 62, 0.08);
-}
-
-.home-moment__action i {
-  font-size: 0.85em;
-}
-
-/* 瞬间评论面板 — 默认折叠，点击展开 */
-.home-moment__comments,
-.moment-card__comments {
-  max-height: 0;
-  overflow: hidden;
-  margin-top: 0;
-  padding-top: 0;
-  border-top: 0;
-  transition: max-height 0.4s ease, margin 0.3s ease, padding 0.3s ease;
-}
-
-.home-moment__comments.is-expanded,
-.moment-card__comments.is-expanded {
-  max-height: 5000px;
-  margin-top: 0.8rem;
-  padding-top: 0.8rem;
-  border-top: solid 0.05rem var(--color-border);
-}
-
-/* 全部动态入口间距 */
-.home-moments .cat-posts__more {
-  padding: 0.5rem 0 1.5rem;
-}
-
-/* 瞬间卡片互动 */
-.moment-card__actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding-top: 0.8rem;
-  margin-top: 0.8rem;
-  border-top: solid 0.05rem var(--color-border);
-}
-
-/* ========== 瞬间页面：标签筛选 ========== */
-.moments-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 1.5rem 2rem;
-  max-width: 50rem;
-  margin: 0 auto;
-}
-
-.moments-tags__item {
-  font-size: 0.7em;
-  font-weight: 600;
-  color: var(--color-text-dim);
-  text-decoration: none;
-  padding: 0.3rem 0.8rem;
-  border-radius: 0.3rem;
-  transition: 0.2s;
-  border: solid 0.1rem transparent;
-}
-
-.moments-tags__item:hover {
-  color: var(--color-text-secondary);
-}
-
-.moments-tags__item--active {
-  color: var(--color-primary);
-  border-color: var(--color-primary-alpha-xl);
-  background-color: var(--color-primary-alpha-sm);
-}
-
-/* ========== 瞬间页面：卡片列表 ========== */
-.moments-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.moment-card {
-  background-color: var(--color-bg-base);
-  border: solid 0.1rem var(--color-border);
-  border-radius: 1rem;
-  padding: 2rem;
-}
-
-.moment-card__header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  padding-bottom: 0.8rem;
-  border-bottom: solid 0.05rem var(--color-border-muted);
-}
-
-.moment-card__avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.moment-card__meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
-.moment-card__name {
-  font-size: 0.85em;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.moment-card__time {
-  font-size: 0.65em;
-  color: var(--color-text-dim);
-}
-
-.moment-card__content {
-  font-size: 0.85em;
-  color: var(--color-text-secondary);
-  line-height: 1.8;
-}
-
-.moment-card__content a {
-  color: var(--color-primary);
-}
-
-.moment-card__content p {
-  margin-bottom: 0.5rem;
-}
-
-.moment-card__media {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 0.6rem;
-  margin-top: 1rem;
-}
-
-.moment-card__photo {
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: opacity 0.3s;
-}
-
-.moment-card__photo:hover {
-  opacity: 0.85;
-}
-
-.moment-card__video {
-  width: 100%;
-  max-height: 360px;
-  border-radius: 0.5rem;
 }
 
 /* ========== 页面主布局（通用） ========== */
@@ -3554,4 +3308,197 @@ comment-widget {
   .sticky-pagination__text {
     font-size: 0.65em;
   }
+}
+
+/* ================================================================
+   Nex 动画系统（由后台「动画」设置控制，门控类加在 <html> 上）
+   ================================================================ */
+
+/* ---------- 入场动画（由 JS + GSAP 驱动，will-change 由 GSAP 在动画期间自动管理） ---------- */
+
+/* ---------- 悬停：卡片上浮 + 阴影 ---------- */
+html.nex-hover-lift .post-card,
+html.nex-hover-lift .tag-chip,
+html.nex-hover-lift .link-card__link,
+html.nex-hover-lift .cat-posts__item,
+html.nex-hover-lift .archive-sidebar__card {
+  transition: transform 0.45s var(--ease-smooth), box-shadow 0.45s var(--ease-smooth), border-color 0.3s, background-color 0.3s;
+  will-change: transform;
+}
+
+html.nex-hover-lift .post-card:hover,
+html.nex-hover-lift .tag-chip:hover,
+html.nex-hover-lift .link-card__link:hover,
+html.nex-hover-lift .cat-posts__item:hover,
+html.nex-hover-lift .archive-sidebar__card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px -18px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme="light"].nex-hover-lift .post-card:hover,
+html[data-theme="light"].nex-hover-lift .tag-chip:hover,
+html[data-theme="light"].nex-hover-lift .link-card__link:hover,
+html[data-theme="light"].nex-hover-lift .cat-posts__item:hover,
+html[data-theme="light"].nex-hover-lift .archive-sidebar__card:hover {
+  box-shadow: 0 18px 36px -20px rgba(0, 0, 0, 0.22);
+}
+
+/* ---------- 悬停：主色发光描边 ---------- */
+html.nex-hover-glow .post-card,
+html.nex-hover-glow .tag-chip,
+html.nex-hover-glow .link-card__link,
+html.nex-hover-glow .cat-posts__item {
+  position: relative;
+}
+
+html.nex-hover-glow .post-card::after,
+html.nex-hover-glow .tag-chip::after,
+html.nex-hover-glow .link-card__link::after,
+html.nex-hover-glow .cat-posts__item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s var(--ease-out);
+  box-shadow: inset 0 0 0 1px var(--color-primary), 0 0 26px -8px var(--color-primary);
+}
+
+html.nex-hover-glow .post-card:hover::after,
+html.nex-hover-glow .tag-chip:hover::after,
+html.nex-hover-glow .link-card__link:hover::after,
+html.nex-hover-glow .cat-posts__item:hover::after {
+  opacity: 1;
+}
+
+/* ---------- 悬停：封面图片缩放 ---------- */
+html.nex-hover-zoom .post-card__cover img {
+  transform: scale(1.02);
+  transition: transform 0.6s var(--ease-smooth);
+}
+
+html.nex-hover-zoom .post-card:hover .post-card__cover img {
+  transform: scale(1.08);
+}
+
+html.nex-hover-zoom .link-card__avatar img {
+  transition: transform 0.5s var(--ease-smooth);
+}
+
+html.nex-hover-zoom .link-card__link:hover .link-card__avatar img {
+  transform: scale(1.1);
+}
+
+/* ---------- 环境：渐变流光背景（内容之下，transform 动画走 GPU 合成） ---------- */
+html.nex-ambient-gradient body::before {
+  content: "";
+  position: fixed;
+  inset: -25%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(42% 42% at 28% 32%, color-mix(in srgb, var(--color-primary) 26%, transparent), transparent 72%),
+    radial-gradient(36% 36% at 72% 60%, color-mix(in srgb, var(--color-primary) 20%, transparent), transparent 72%),
+    radial-gradient(46% 46% at 50% 88%, color-mix(in srgb, var(--color-primary) 22%, transparent), transparent 72%);
+  animation: nex-gradient-drift 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes nex-gradient-drift {
+  0%   { transform: translate3d(-3%, -2%, 0) scale(1); }
+  50%  { transform: translate3d(3%, 2%, 0) scale(1.08); }
+  100% { transform: translate3d(-2%, 4%, 0) scale(1.02); }
+}
+
+/* ---------- 环境：粒子背景（canvas，由 JS 创建，内容之下） ---------- */
+.nex-particles {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* 背景特效开启时，内容提升到背景层之上 */
+html.nex-ambient-particles #pjax-container,
+html.nex-ambient-particles .site-footer,
+html.nex-ambient-gradient #pjax-container,
+html.nex-ambient-gradient .site-footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- 环境：光标光晕（由 JS 创建，尺寸可自定义） ---------- */
+.nex-cursor-glow {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 560px;
+  height: 560px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-primary) 13%, transparent) 0%, transparent 62%);
+  will-change: transform;
+}
+
+:root[data-theme="light"] .nex-cursor-glow {
+  mix-blend-mode: multiply;
+}
+
+/* ---------- 页面切换（PJAX） ---------- */
+#pjax-container {
+  transition: opacity 0.25s ease, transform 0.25s var(--ease-smooth);
+}
+
+#pjax-container.is-leaving {
+  opacity: 0;
+}
+
+#pjax-container.is-leaving,
+#pjax-container.is-entering {
+  will-change: opacity, transform;
+}
+
+html.nex-anim #pjax-container {
+  transition-duration: var(--nex-td, 0.35s);
+}
+
+html.nex-transition-slide #pjax-container.is-leaving {
+  opacity: 0;
+  transform: translate3d(-48px, 0, 0);
+}
+
+html.nex-transition-slide #pjax-container.is-entering {
+  opacity: 0;
+  transform: translate3d(48px, 0, 0);
+  transition: none;
+}
+
+/* ---------- 流光渐变开启时：内容与 Banner 底部衔接流光背景，消除断层 ---------- */
+html.nex-ambient-gradient .page-content {
+  background-color: transparent;
+}
+
+html.nex-ambient-gradient .banner--love {
+  background: none;
+}
+
+html.nex-ambient-gradient .banner-slide {
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+}
+
+html.nex-ambient-gradient .banner-overlay,
+html.nex-ambient-gradient .banner--love::after {
+  background: none;
+}
+
+/* ---------- Banner 与「最新内容」之间增加间距，避免重叠/断层 ---------- */
+.banner--love + .cat-group {
+  padding-top: 2.5rem;
 }

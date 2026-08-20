@@ -23,11 +23,26 @@ spec:
             - label: 亮色
               value: light
           help: "访客首次访问时使用的主题，访客可自行在右上角切换并记住选择"
-        - $formkit: text
+        - $formkit: attachment
           name: custom_font
-          label: 自定义字体URL
+          label: 自定义字体文件
           value: ""
-          help: "输入字体文件的URL地址，留空则使用默认系统字体。支持 woff2、woff、ttf、eot、svg 格式"
+          accepts:
+            - "font/woff2"
+            - "application/font-woff"
+            - "font/woff"
+            - "font/ttf"
+            - "application/x-font-ttf"
+            - "application/x-font-truetype"
+            - "font/otf"
+            - "application/vnd.ms-opentype"
+            - "application/x-font-otf"
+            - "application/x-font-opentype"
+            - "font/sfnt"
+            - "application/font-sfnt"
+            - "application/vnd.ms-fontobject"
+            - "application/octet-stream"
+          help: "上传自定义字体文件（支持 woff2、woff、ttf、otf 等格式），留空则使用默认系统字体"
         - $formkit: attachment
           name: avatar
           label: 默认头像
@@ -38,14 +53,85 @@ spec:
     - group: homepage
       label: 首页
       formSchema:
-        - $formkit: attachment
-          name: banner_images
-          label: Banner 背景图
-          multiple: true
+        - $formkit: array
+          name: banner_items
+          label: Banner 幻灯片
           value: []
-          accepts:
-            - "image/*"
-          help: "首页顶部Banner的背景图片，可添加多张自动轮播，留空则使用默认暗色渐变"
+          addLabel: 添加幻灯片
+          itemLabels:
+            - type: image
+              label: $value.image
+            - type: text
+              label: $value.text
+          help: "每张背景图可单独设置宣传文字、颜色、大小、位置与跳转链接，留空则使用默认暗色渐变"
+          children:
+            - $formkit: attachment
+              name: image
+              label: 背景图
+              value: ""
+              accepts:
+                - "image/*"
+            - $formkit: text
+              name: text
+              label: 宣传文字
+              value: ""
+              help: "显示在背景图上的文字，留空则不显示"
+            - $formkit: select
+              name: text_position
+              label: 文字位置
+              value: center
+              options:
+                - label: 左上
+                  value: top-left
+                - label: 上中
+                  value: top-center
+                - label: 右上
+                  value: top-right
+                - label: 左中
+                  value: middle-left
+                - label: 居中
+                  value: center
+                - label: 右中
+                  value: middle-right
+                - label: 左下
+                  value: bottom-left
+                - label: 下中
+                  value: bottom-center
+                - label: 右下
+                  value: bottom-right
+            - $formkit: color
+              name: text_color
+              label: 文字颜色
+              value: "#ffffff"
+            - $formkit: number
+              name: text_size
+              label: 文字大小（px）
+              value: 40
+            - $formkit: attachment
+              name: text_font
+              label: 文字字体文件
+              value: ""
+              accepts:
+                - "font/woff2"
+                - "application/font-woff"
+                - "font/woff"
+                - "font/ttf"
+                - "application/x-font-ttf"
+                - "application/x-font-truetype"
+                - "font/otf"
+                - "application/vnd.ms-opentype"
+                - "application/x-font-otf"
+                - "application/x-font-opentype"
+                - "font/sfnt"
+                - "application/font-sfnt"
+                - "application/vnd.ms-fontobject"
+                - "application/octet-stream"
+              help: "单独设置这条宣传文字的字体文件（woff2、woff、ttf、otf 等），留空则使用默认字体（不跟随全局自定义字体）"
+            - $formkit: text
+              name: link
+              label: 跳转链接
+              value: ""
+              help: "点击整张背景图跳转的链接，留空则不跳转"
         - $formkit: number
           name: banner_interval
           label: 轮播间隔（秒）
@@ -61,6 +147,18 @@ spec:
           label: logo图片(暗色)
           value: ""
           help: "务必设置！ 亮色主题选择建议选暗色图标"  
+
+    # ────────── 文章 ──────────
+    - group: post
+      label: 文章
+      formSchema:
+        - $formkit: attachment
+          name: default_cover
+          label: 默认封面
+          value: ""
+          accepts:
+            - "image/*"
+          help: "文章未设置封面时使用的默认封面图片，留空则使用主题内置背景图"
 
     # ────────── 页脚 ──────────
     - group: footer
@@ -158,6 +256,534 @@ spec:
           min: 0
           max: 100
           help: "数值越高背景越不透明（0 完全透明，100 完全不透明），仅开启对话框透明背景时生效"
+
+    # ────────── 动画（全局） ──────────
+    - group: anim
+      label: 动画
+      formSchema:
+        - $formkit: switch
+          name: enabled
+          label: 启用动画
+          value: false
+          help: "总开关。开启后启用入场、悬停、环境与页面切换动画；关闭则保持主题默认的简洁淡入效果"
+        - $formkit: select
+          name: effect
+          label: 默认入场效果
+          value: fade-up
+          options:
+            - label: 淡入上移（默认）
+              value: fade-up
+            - label: 淡入
+              value: fade-in
+            - label: 淡入下移
+              value: fade-down
+            - label: 左侧滑入
+              value: slide-left
+            - label: 右侧滑入
+              value: slide-right
+            - label: 缩放浮现
+              value: zoom
+            - label: 模糊淡入
+              value: blur
+            - label: 旋转淡入
+              value: rotate
+            - label: 无动画
+              value: none
+        - $formkit: number
+          name: duration
+          label: 默认时长（秒）
+          value: 0.8
+          min: 0.1
+          max: 3
+          step: 0.1
+        - $formkit: number
+          name: delay
+          label: 默认延迟（秒）
+          value: 0
+          min: 0
+          max: 2
+          step: 0.05
+        - $formkit: number
+          name: stagger
+          label: 列表入场间隔（秒）
+          value: 0.08
+          min: 0
+          max: 1
+          step: 0.02
+          help: "卡片、列表等多项内容依次入场的时间间隔"
+        - $formkit: select
+          name: transition_effect
+          label: 页面切换动画
+          value: slide
+          options:
+            - label: 横向滑动
+              value: slide
+            - label: 淡入淡出
+              value: fade
+          help: "站内跳转（PJAX）时的页面过渡效果"
+        - $formkit: number
+          name: transition_duration
+          label: 页面切换时长（秒）
+          value: 0.35
+          min: 0.1
+          max: 1
+          step: 0.05
+        - $formkit: switch
+          name: hover_lift
+          label: 卡片上浮 + 阴影
+          value: true
+          help: "悬停卡片时轻微上浮并浮现柔和阴影"
+        - $formkit: switch
+          name: hover_glow
+          label: 发光描边
+          value: true
+          help: "悬停卡片时主色光晕描边"
+        - $formkit: switch
+          name: hover_zoom
+          label: 封面图片缩放
+          value: true
+          help: "悬停卡片时封面图片缓慢放大"
+        - $formkit: switch
+          name: ambient_cursor
+          label: 光标光晕
+          value: false
+          help: "跟随鼠标的柔和光晕（移动端自动禁用）"
+        - $formkit: number
+          name: ambient_cursor_size
+          label: 光晕大小（px）
+          value: 560
+          min: 160
+          max: 1200
+          step: 10
+          help: "光标光晕的直径，数值越大光晕越大（仅开启光标光晕时生效）"
+        - $formkit: switch
+          name: ambient_particles
+          label: 粒子背景
+          value: false
+          help: "轻量漂浮粒子背景（移动端自动禁用）"
+        - $formkit: switch
+          name: ambient_gradient
+          label: 渐变流光背景
+          value: false
+          help: "页面背景缓慢流动的渐变光效"
+        - $formkit: switch
+          name: ambient_parallax
+          label: 鼠标视差
+          value: false
+          help: "页面元素随鼠标轻微 3D 位移（移动端自动禁用）"
+
+    # ────────── 动画（分区块） ──────────
+    - group: anim_blocks
+      label: 动画·分区
+      formSchema:
+        - $formkit: switch
+          name: nav_enable
+          label: 导航栏
+          value: true
+        - $formkit: select
+          name: nav_effect
+          label: 导航栏效果
+          value: ""
+          options:
+            - label: 跟随全局
+              value: ""
+            - label: 淡入上移
+              value: fade-up
+            - label: 淡入
+              value: fade-in
+            - label: 淡入下移
+              value: fade-down
+            - label: 左侧滑入
+              value: slide-left
+            - label: 右侧滑入
+              value: slide-right
+            - label: 缩放浮现
+              value: zoom
+            - label: 模糊淡入
+              value: blur
+            - label: 旋转淡入
+              value: rotate
+            - label: 无动画
+              value: none
+        - $formkit: number
+          name: nav_duration
+          label: 导航栏时长（秒）
+          value: ""
+          help: "留空跟随全局"
+        - $formkit: switch
+          name: banner_enable
+          label: 首页 Banner
+          value: true
+        - $formkit: select
+          name: banner_effect
+          label: Banner 效果
+          value: ""
+          options:
+            - label: 跟随全局
+              value: ""
+            - label: 淡入上移
+              value: fade-up
+            - label: 淡入
+              value: fade-in
+            - label: 淡入下移
+              value: fade-down
+            - label: 左侧滑入
+              value: slide-left
+            - label: 右侧滑入
+              value: slide-right
+            - label: 缩放浮现
+              value: zoom
+            - label: 模糊淡入
+              value: blur
+            - label: 旋转淡入
+              value: rotate
+            - label: 无动画
+              value: none
+        - $formkit: number
+          name: banner_duration
+          label: Banner 时长（秒）
+          value: ""
+          help: "留空跟随全局"
+        - $formkit: switch
+          name: post_list_enable
+          label: 首页最新列表
+          value: true
+        - $formkit: select
+          name: post_list_effect
+          label: 列表效果
+          value: ""
+          options:
+            - label: 跟随全局
+              value: ""
+            - label: 淡入上移
+              value: fade-up
+            - label: 淡入
+              value: fade-in
+            - label: 淡入下移
+              value: fade-down
+            - label: 左侧滑入
+              value: slide-left
+            - label: 右侧滑入
+              value: slide-right
+            - label: 缩放浮现
+              value: zoom
+            - label: 模糊淡入
+              value: blur
+            - label: 旋转淡入
+              value: rotate
+            - label: 无动画
+              value: none
+        - $formkit: number
+          name: post_list_duration
+          label: 列表时长（秒）
+          value: ""
+          help: "留空跟随全局"
+        - $formkit: switch
+          name: page_hero_enable
+          label: 页面头部 Hero
+          value: true
+        - $formkit: select
+          name: page_hero_effect
+          label: Hero 效果
+          value: ""
+          options:
+            - label: 跟随全局
+              value: ""
+            - label: 淡入上移
+              value: fade-up
+            - label: 淡入
+              value: fade-in
+            - label: 淡入下移
+              value: fade-down
+            - label: 左侧滑入
+              value: slide-left
+            - label: 右侧滑入
+              value: slide-right
+            - label: 缩放浮现
+              value: zoom
+            - label: 模糊淡入
+              value: blur
+            - label: 旋转淡入
+              value: rotate
+            - label: 无动画
+              value: none
+        - $formkit: number
+          name: page_hero_duration
+          label: Hero 时长（秒）
+          value: ""
+          help: "留空跟随全局"
+        - $formkit: switch
+          name: post_card_enable
+          label: 文章卡片
+          value: true
+        - $formkit: select
+          name: post_card_effect
+          label: 卡片效果
+          value: ""
+          options:
+            - label: 跟随全局
+              value: ""
+            - label: 淡入上移
+              value: fade-up
+            - label: 淡入
+              value: fade-in
+            - label: 淡入下移
+              value: fade-down
+            - label: 左侧滑入
+              value: slide-left
+            - label: 右侧滑入
+              value: slide-right
+            - label: 缩放浮现
+              value: zoom
+            - label: 模糊淡入
+              value: blur
+            - label: 旋转淡入
+              value: rotate
+            - label: 无动画
+              value: none
+        - $formkit: number
+          name: post_card_duration
+          label: 卡片时长（秒）
+          value: ""
+          help: "留空跟随全局"
+        - $formkit: switch
+          name: tag_chip_enable
+          label: 标签/分类卡片
+          value: true
+        - $formkit: select
+          name: tag_chip_effect
+          label: 标签卡片效果
+          value: ""
+          options:
+            - label: 跟随全局
+              value: ""
+            - label: 淡入上移
+              value: fade-up
+            - label: 淡入
+              value: fade-in
+            - label: 淡入下移
+              value: fade-down
+            - label: 左侧滑入
+              value: slide-left
+            - label: 右侧滑入
+              value: slide-right
+            - label: 缩放浮现
+              value: zoom
+            - label: 模糊淡入
+              value: blur
+            - label: 旋转淡入
+              value: rotate
+            - label: 无动画
+              value: none
+        - $formkit: number
+          name: tag_chip_duration
+          label: 标签卡片时长（秒）
+          value: ""
+          help: "留空跟随全局"
+        - $formkit: switch
+          name: link_card_enable
+          label: 友链卡片
+          value: true
+        - $formkit: select
+          name: link_card_effect
+          label: 友链卡片效果
+          value: ""
+          options:
+            - label: 跟随全局
+              value: ""
+            - label: 淡入上移
+              value: fade-up
+            - label: 淡入
+              value: fade-in
+            - label: 淡入下移
+              value: fade-down
+            - label: 左侧滑入
+              value: slide-left
+            - label: 右侧滑入
+              value: slide-right
+            - label: 缩放浮现
+              value: zoom
+            - label: 模糊淡入
+              value: blur
+            - label: 旋转淡入
+              value: rotate
+            - label: 无动画
+              value: none
+        - $formkit: number
+          name: link_card_duration
+          label: 友链卡片时长（秒）
+          value: ""
+          help: "留空跟随全局"
+        - $formkit: switch
+          name: archive_list_enable
+          label: 归档列表
+          value: true
+        - $formkit: select
+          name: archive_list_effect
+          label: 归档列表效果
+          value: ""
+          options:
+            - label: 跟随全局
+              value: ""
+            - label: 淡入上移
+              value: fade-up
+            - label: 淡入
+              value: fade-in
+            - label: 淡入下移
+              value: fade-down
+            - label: 左侧滑入
+              value: slide-left
+            - label: 右侧滑入
+              value: slide-right
+            - label: 缩放浮现
+              value: zoom
+            - label: 模糊淡入
+              value: blur
+            - label: 旋转淡入
+              value: rotate
+            - label: 无动画
+              value: none
+        - $formkit: number
+          name: archive_list_duration
+          label: 归档列表时长（秒）
+          value: ""
+          help: "留空跟随全局"
+        - $formkit: switch
+          name: post_content_enable
+          label: 文章正文
+          value: true
+        - $formkit: select
+          name: post_content_effect
+          label: 正文效果
+          value: ""
+          options:
+            - label: 跟随全局
+              value: ""
+            - label: 淡入上移
+              value: fade-up
+            - label: 淡入
+              value: fade-in
+            - label: 淡入下移
+              value: fade-down
+            - label: 左侧滑入
+              value: slide-left
+            - label: 右侧滑入
+              value: slide-right
+            - label: 缩放浮现
+              value: zoom
+            - label: 模糊淡入
+              value: blur
+            - label: 旋转淡入
+              value: rotate
+            - label: 无动画
+              value: none
+        - $formkit: number
+          name: post_content_duration
+          label: 正文时长（秒）
+          value: ""
+          help: "留空跟随全局"
+        - $formkit: switch
+          name: sidebar_enable
+          label: 侧边栏
+          value: true
+        - $formkit: select
+          name: sidebar_effect
+          label: 侧边栏效果
+          value: ""
+          options:
+            - label: 跟随全局
+              value: ""
+            - label: 淡入上移
+              value: fade-up
+            - label: 淡入
+              value: fade-in
+            - label: 淡入下移
+              value: fade-down
+            - label: 左侧滑入
+              value: slide-left
+            - label: 右侧滑入
+              value: slide-right
+            - label: 缩放浮现
+              value: zoom
+            - label: 模糊淡入
+              value: blur
+            - label: 旋转淡入
+              value: rotate
+            - label: 无动画
+              value: none
+        - $formkit: number
+          name: sidebar_duration
+          label: 侧边栏时长（秒）
+          value: ""
+          help: "留空跟随全局"
+        - $formkit: switch
+          name: footer_enable
+          label: 页脚
+          value: true
+        - $formkit: select
+          name: footer_effect
+          label: 页脚效果
+          value: ""
+          options:
+            - label: 跟随全局
+              value: ""
+            - label: 淡入上移
+              value: fade-up
+            - label: 淡入
+              value: fade-in
+            - label: 淡入下移
+              value: fade-down
+            - label: 左侧滑入
+              value: slide-left
+            - label: 右侧滑入
+              value: slide-right
+            - label: 缩放浮现
+              value: zoom
+            - label: 模糊淡入
+              value: blur
+            - label: 旋转淡入
+              value: rotate
+            - label: 无动画
+              value: none
+        - $formkit: number
+          name: footer_duration
+          label: 页脚时长（秒）
+          value: ""
+          help: "留空跟随全局"
+        - $formkit: switch
+          name: comments_enable
+          label: 评论区
+          value: true
+        - $formkit: select
+          name: comments_effect
+          label: 评论区效果
+          value: ""
+          options:
+            - label: 跟随全局
+              value: ""
+            - label: 淡入上移
+              value: fade-up
+            - label: 淡入
+              value: fade-in
+            - label: 淡入下移
+              value: fade-down
+            - label: 左侧滑入
+              value: slide-left
+            - label: 右侧滑入
+              value: slide-right
+            - label: 缩放浮现
+              value: zoom
+            - label: 模糊淡入
+              value: blur
+            - label: 旋转淡入
+              value: rotate
+            - label: 无动画
+              value: none
+        - $formkit: number
+          name: comments_duration
+          label: 评论区时长（秒）
+          value: ""
+          help: "留空跟随全局"
 
 
    

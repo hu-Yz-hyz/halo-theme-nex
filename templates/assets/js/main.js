@@ -1,84 +1,11 @@
 /* ========== EverUs Theme JS for Halo ========== */
 
-/* ---------  瞬间 upvote 本地状态  --------- */
-var UPVOTE_STORAGE_KEY = 'halo.upvoted.moment.names';
-
-function getUpvotedNames() {
-  try {
-    return JSON.parse(localStorage.getItem(UPVOTE_STORAGE_KEY) || '[]');
-  } catch (e) {
-    return [];
-  }
-}
-
-function isMomentUpvoted(name) {
-  return getUpvotedNames().indexOf(name) !== -1;
-}
-
-function handleMomentUpvote(btn, name) {
-  if (isMomentUpvoted(name)) return;
-
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', '/apis/api.halo.run/v1alpha1/trackers/upvote');
-  xhr.setRequestHeader('Content-Type', 'application/json');
-
-  xhr.onload = function () {
-    if (xhr.status < 200 || xhr.status >= 300) return;
-    var names = getUpvotedNames();
-    names.push(name);
-    localStorage.setItem(UPVOTE_STORAGE_KEY, JSON.stringify(names));
-
-    // Update all count displays for this moment
-    var spans = document.querySelectorAll('[data-upvote-moment-name="' + name + '"]');
-    spans.forEach(function (span) {
-      var count = parseInt(span.textContent || '0');
-      span.textContent = (count + 1) + '';
-    });
-
-    // Mark all like buttons for this moment as liked
-    markMomentLiked(name);
-  };
-
-  xhr.onerror = function () {
-    console.error('点赞失败，请稍后再试');
-  };
-
-  xhr.send(JSON.stringify({
-    group: 'moment.halo.run',
-    plural: 'moments',
-    name: name
-  }));
-}
-
-// Mark already-upvoted moments as liked on page load
-function markMomentLiked(name) {
-  document.querySelectorAll('[data-upvote-moment-name="' + name + '"]').forEach(function (span) {
-    var btn = span.closest('.home-moment__action--like, .moment-card__action--like');
-    if (btn) {
-      btn.style.color = '#e53e3e';
-      btn.classList.add('is-liked');
-    }
-  });
-}
-
-function initMomentUpvotes() {
-  var names = getUpvotedNames();
-  names.forEach(function (name) {
-    markMomentLiked(name);
-  });
-}
-
-/* ---------  瞬间评论切换  --------- */
-function toggleMomentComments(name) {
-  var el = document.getElementById('moment-comments-' + name);
-  if (!el) return;
-  el.classList.toggle('is-expanded');
-}
-
 /* ==========  布局级初始化（仅首次加载执行一次）  ========== */
 function initLayoutOnce() {
   if (window.__everusLayoutReady) return;
   window.__everusLayoutReady = true;
+
+  initNexCore();
 
   (function ($) {
     /* ---------  Scroll Box (Back to top)  --------- */
@@ -237,19 +164,23 @@ function initLayoutOnce() {
 /* ==========  页面级初始化（每次页面加载时执行）  ========== */
 function initPageContent() {
   /* ---------  GSAP Scroll Animations  --------- */
-  animateParagraphs();
+  if (document.documentElement.classList.contains('nex-anim')) {
+    initNexAnimations();
+  } else {
+    animateParagraphs();
+  }
 
   /* ---------  Banner 轮播  --------- */
   initBannerCarousel();
+
+  /* ---------  Banner 文字自定义字体  --------- */
+  initBannerFonts();
 
   /* ---------  Active link in nav  --------- */
   setActiveLink();
 
   /* ---------  Fancybox .zoom 按钮委托（每页重新绑定）  --------- */
   initZoomButtons();
-
-  /* ---------  初始化瞬间点赞状态  --------- */
-  initMomentUpvotes();
 
   /* ---------  链接页分组 tab 滚动至当前激活项  --------- */
   (function () {
@@ -290,6 +221,295 @@ function animateParagraphs() {
       }
     });
   });
+}
+
+/* ==========  Nex 动画引擎（由后台「动画」设置驱动）  ========== */
+var NEX = {
+  cfg: { global: {}, blocks: {} },
+  animOn: false,
+  reduced: false,
+  touch: false
+};
+
+function nexNum(v, d) {
+  var n = parseFloat(v);
+  return isNaN(n) ? d : n;
+}
+
+function nexEffectState(effect) {
+  switch (effect) {
+    case 'fade-in': return { opacity: 0 };
+    case 'fade-down': return { opacity: 0, y: -30 };
+    case 'slide-left': return { opacity: 0, x: -60 };
+    case 'slide-right': return { opacity: 0, x: 60 };
+    case 'zoom': return { opacity: 0, scale: 0.94 };
+    case 'blur': return { opacity: 0, filter: 'blur(14px)' };
+    case 'rotate': return { opacity: 0, rotate: -4, scale: 0.97, y: 18 };
+    default: return { opacity: 0, y: 30 };
+  }
+}
+
+function initNexCore() {
+  if (window.__nexCoreReady) return;
+  window.__nexCoreReady = true;
+
+  NEX.cfg = window.NEX_ANIM || { global: {}, blocks: {} };
+  NEX.cfg.global = NEX.cfg.global || {};
+  NEX.cfg.blocks = NEX.cfg.blocks || {};
+  NEX.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  NEX.touch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+  NEX.animOn = document.documentElement.classList.contains('nex-anim');
+
+  if (!NEX.animOn) return;
+
+  var html = document.documentElement;
+  var dur = NEX.cfg.global.transition_duration;
+  if (dur && parseFloat(dur) > 0) {
+    html.style.setProperty('--nex-td', parseFloat(dur) + 's');
+  }
+
+  if (NEX.reduced) return;
+  if (html.classList.contains('nex-ambient-cursor')) initNexCursorGlow();
+  if (html.classList.contains('nex-ambient-particles')) initNexParticles();
+  if (html.classList.contains('nex-ambient-parallax')) initNexParallax();
+}
+
+function initNexAnimations() {
+  var html = document.documentElement;
+  if (!html.classList.contains('nex-anim')) return;
+  if (NEX.reduced) return;
+  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  var global = NEX.cfg.global;
+  var blocks = NEX.cfg.blocks;
+  var defEffect = global.effect || 'fade-up';
+  var defDuration = nexNum(global.duration, 0.8);
+  var defDelay = nexNum(global.delay, 0);
+  var defStagger = nexNum(global.stagger, 0.08);
+
+  // 按「父容器 + 区块」分组，每组一个 ScrollTrigger + stagger，减少实例数、提升流畅度
+  var groups = [];
+  document.querySelectorAll('[data-nex-anim]').forEach(function (el) {
+    if (el.dataset.nexDone) return;
+    var key = el.getAttribute('data-nex-anim');
+    if (blocks[key + '_enable'] === false) return;
+    var effect = blocks[key + '_effect'] || defEffect;
+    if (effect === 'none') return;
+
+    var parent = el.parentNode;
+    var found = null;
+    for (var g = 0; g < groups.length; g++) {
+      if (groups[g].parent === parent && groups[g].key === key) {
+        found = groups[g];
+        break;
+      }
+    }
+    if (!found) {
+      found = { parent: parent, key: key, els: [] };
+      groups.push(found);
+    }
+    found.els.push(el);
+  });
+
+  groups.forEach(function (grp) {
+    var els = grp.els;
+    var key = grp.key;
+    var effect = blocks[key + '_effect'] || defEffect;
+    var bDur = parseFloat(blocks[key + '_duration']);
+    var duration = bDur > 0 ? bDur : defDuration;
+    var stagger = els.length > 1 ? Math.min(defStagger, 1.2 / els.length) : 0;
+
+    els.forEach(function (el) {
+      el.style.transition = 'none';
+      el.dataset.nexDone = '1';
+    });
+
+    gsap.fromTo(els, nexEffectState(effect), {
+      opacity: 1, x: 0, y: 0, scale: 1, rotate: 0, filter: 'blur(0px)',
+      duration: duration,
+      delay: defDelay,
+      stagger: stagger,
+      ease: 'power3.out',
+      clearProps: 'all',
+      overwrite: 'auto',
+      onComplete: function () {
+        els.forEach(function (el) {
+          el.style.transition = '';
+          el.style.willChange = '';
+          el.style.transform = '';
+          el.style.opacity = '';
+          el.style.filter = '';
+        });
+      },
+      scrollTrigger: {
+        trigger: els[0],
+        start: 'top 92%',
+        once: true
+      }
+    });
+  });
+}
+
+/* ---- 环境：光标光晕 ---- */
+function initNexCursorGlow() {
+  if (NEX.touch) return;
+  var el = document.createElement('div');
+  el.className = 'nex-cursor-glow';
+  document.body.appendChild(el);
+
+  var size = nexNum(NEX.cfg.global.ambient_cursor_size, 560);
+  if (size < 80) size = 560;
+  el.style.width = size + 'px';
+  el.style.height = size + 'px';
+  var half = size / 2;
+
+  var x = window.innerWidth / 2;
+  var y = window.innerHeight / 2;
+  var tx = x, ty = y;
+  var shown = false;
+
+  document.addEventListener('mousemove', function (e) {
+    tx = e.clientX;
+    ty = e.clientY;
+    if (!shown) {
+      shown = true;
+      el.style.opacity = '1';
+    }
+  });
+
+  function loop() {
+    x += (tx - x) * 0.12;
+    y += (ty - y) * 0.12;
+    el.style.transform = 'translate3d(' + (x - half) + 'px,' + (y - half) + 'px,0)';
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+}
+
+/* ---- 环境：粒子背景 ---- */
+function initNexParticles() {
+  if (NEX.touch) return;
+  var canvas = document.createElement('canvas');
+  canvas.className = 'nex-particles';
+  document.body.appendChild(canvas);
+
+  var ctx = canvas.getContext('2d');
+  var w = 0, h = 0, dpr = 1, particles = [];
+  var color = (getComputedStyle(document.documentElement).getPropertyValue('--color-primary') || '').trim() || '#26a760';
+
+  function colorToRgba(c, a) {
+    c = String(c).trim();
+    var m = c.match(/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/);
+    if (m) {
+      return 'rgba(' + m[1] + ',' + m[2] + ',' + m[3] + ',' + a + ')';
+    }
+    var hex = c.replace('#', '');
+    if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+    var n = parseInt(hex, 16);
+    if (isNaN(n)) return 'rgba(38,167,96,' + a + ')';
+    return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+  }
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = canvas.clientWidth;
+    h = canvas.clientHeight;
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var count = Math.min(80, Math.floor((w * h) / 22000));
+    particles = [];
+    for (var i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: Math.random() * 1.7 + 0.5,
+        vx: (Math.random() - 0.5) * 0.24,
+        vy: (Math.random() - 0.5) * 0.24,
+        a: Math.random() * 0.4 + 0.25
+      });
+    }
+  }
+
+  resize();
+
+  var resizeRaf = null;
+  window.addEventListener('resize', function () {
+    if (resizeRaf) return;
+    resizeRaf = requestAnimationFrame(function () {
+      resizeRaf = null;
+      resize();
+    });
+  });
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < -4) p.x = w + 4;
+      if (p.x > w + 4) p.x = -4;
+      if (p.y < -4) p.y = h + 4;
+      if (p.y > h + 4) p.y = -4;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = colorToRgba(color, p.a);
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ---- 环境：鼠标视差 ---- */
+function initNexParallax() {
+  if (NEX.touch) return;
+  var mx = 0, my = 0, cx = 0, cy = 0;
+  var items = [];
+  var lastBanner = null;
+
+  function collect() {
+    items = [];
+    var banner = document.getElementById('home-banner');
+    if (banner) {
+      lastBanner = banner;
+      banner.querySelectorAll('.banner-slide').forEach(function (s) {
+        items.push({ el: s, type: 'bg', depth: 6 });
+      });
+    }
+    document.querySelectorAll('.archive-hero__thumb').forEach(function (img) {
+      items.push({ el: img, type: 'xform', sign: 1, depth: 10 });
+    });
+  }
+
+  document.addEventListener('mousemove', function (e) {
+    mx = e.clientX / window.innerWidth - 0.5;
+    my = e.clientY / window.innerHeight - 0.5;
+  });
+
+  function tick() {
+    var current = document.getElementById('home-banner');
+    if (current !== lastBanner || (items.length && !items[0].el.isConnected)) {
+      collect();
+    }
+    cx += (mx - cx) * 0.05;
+    cy += (my - cy) * 0.05;
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      if (it.type === 'bg') {
+        it.el.style.backgroundPosition = (50 + cx * it.depth) + '% ' + (50 + cy * it.depth) + '%';
+      } else {
+        it.el.style.transform = 'translate3d(' + (it.sign * cx * it.depth) + 'px,' + (it.sign * cy * it.depth) + 'px,0)';
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  collect();
+  requestAnimationFrame(tick);
 }
 
 function setActiveLink() {
@@ -377,14 +597,42 @@ function initBannerCarousel() {
   startTimer();
 }
 
+/* ----------  Banner 文字自定义字体（空 = 默认，不跟随全局字体）  ---------- */
+function initBannerFonts() {
+  var banner = document.getElementById('home-banner');
+  if (!banner) return;
+  var slides = banner.querySelectorAll('.banner-slide');
+  for (var i = 0; i < slides.length; i++) {
+    var text = slides[i].querySelector('.banner-slide__text');
+    if (!text) continue;
+    var fontUrl = text.getAttribute('data-font');
+    if (!fontUrl) {
+      text.classList.add('banner-slide__text--default');
+      continue;
+    }
+    var name = 'banner-font-' + i;
+    var style = document.createElement('style');
+    style.textContent = "@font-face{font-family:'" + name + "';font-weight:400;font-style:normal;font-display:swap;src:url('" + fontUrl + "')} .banner-slide__text--font-" + i + "{font-family:'" + name + "'}";
+    document.head.appendChild(style);
+    text.classList.add('banner-slide__text--font-' + i);
+  }
+}
+
 /* ==========  PJAX 页面过渡  ========== */
 // 原理：点击内部链接 → 淡出内容 → AJAX 拉取新页面 → 替换内容 + 重新执行脚本 → 淡入。
 // 与 swup 的关键区别：PJAX 手动重新执行新内容中的所有 <script>，确保评论组件等正常初始化。
 
 (function () {
   var CONTAINER_ID = 'pjax-container';
-  var TRANSITION_MS = 250;
   var isNavigating = false;
+
+  function transitionInfo() {
+    var html = document.documentElement;
+    var slide = html.classList.contains('nex-transition-slide');
+    var animOn = html.classList.contains('nex-anim');
+    var dur = animOn ? (parseFloat(html.style.getPropertyValue('--nex-td')) || 0.35) : 0.25;
+    return { slide: slide, ms: Math.max(100, Math.round(dur * 1000)) };
+  }
 
   // 拦截内部链接点击
   document.addEventListener('click', function (e) {
@@ -433,6 +681,7 @@ function initBannerCarousel() {
     document.body.classList.remove('nav-open');
 
     var container = document.getElementById(CONTAINER_ID);
+    var ti = transitionInfo();
 
     // 淡出 + 并行 fetch
     if (container) container.classList.add('is-leaving');
@@ -442,7 +691,7 @@ function initBannerCarousel() {
         if (!r.ok) throw new Error('HTTP ' + r.status);
         return r.text();
       }),
-      new Promise(function (resolve) { setTimeout(resolve, TRANSITION_MS); })
+      new Promise(function (resolve) { setTimeout(resolve, ti.ms); })
     ]).then(function (results) {
       var html = results[0];
       var doc = new DOMParser().parseFromString(html, 'text/html');
@@ -469,7 +718,7 @@ function initBannerCarousel() {
         try { ScrollTrigger.getAll().forEach(function (t) { t.kill(); }); } catch (e) {}
       }
       if (typeof gsap !== 'undefined') {
-        try { gsap.killTweensOf('.up, .post__content > p'); } catch (e) {}
+        try { gsap.killTweensOf('.up, .post__content > p, [data-nex-anim]'); } catch (e) {}
       }
 
       // ④ 替换内容
@@ -520,17 +769,29 @@ function initBannerCarousel() {
       // ⑧ 重新初始化页面组件
       initPageContent();
 
-      // ⑨ 淡入（双 rAF 确保新内容已以 opacity:0 渲染过一帧）
-      requestAnimationFrame(function () {
+      // ⑨ 淡入
+      if (ti.slide) {
+        container.classList.add('is-entering');
+        container.classList.remove('is-leaving');
+        void container.offsetWidth;
+        container.classList.remove('is-entering');
+        isNavigating = false;
+        if (typeof ScrollTrigger !== 'undefined') {
+          try { ScrollTrigger.refresh(); } catch (e) {}
+        }
+      } else {
+        // 淡入（双 rAF 确保新内容已以 opacity:0 渲染过一帧）
         requestAnimationFrame(function () {
-          container.classList.remove('is-leaving');
-          isNavigating = false;
-          // 刷新 ScrollTrigger 位置
-          if (typeof ScrollTrigger !== 'undefined') {
-            try { ScrollTrigger.refresh(); } catch (e) {}
-          }
+          requestAnimationFrame(function () {
+            container.classList.remove('is-leaving');
+            isNavigating = false;
+            // 刷新 ScrollTrigger 位置
+            if (typeof ScrollTrigger !== 'undefined') {
+              try { ScrollTrigger.refresh(); } catch (e) {}
+            }
+          });
         });
-      });
+      }
     }).catch(function () {
       // 任何错误 → 回退到正常跳转
       window.location.href = url;
